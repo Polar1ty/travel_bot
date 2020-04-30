@@ -21,12 +21,14 @@ from selenium import webdriver
 # q.execute('''
 # 			CREATE TABLE "user" (
 # 				'id' TEXT,
-# 				'surname' TEXT,
-# 				'name' TEXT,
-# 				'date_of_birth' TEXT,
-# 				'address' TEXT,
-# 				'email' TEXT,
-# 				'phone' TEXT
+# 				'country' TEXT,
+# 				'city' TEXT,
+# 				'date_from' TEXT,
+# 				'nights' TEXT,
+# 				'adults' TEXT,
+# 				'childs' TEXT,
+# 				'stars' TEXT,
+# 				'cost' TEXT
 # 			)''')
 # connection.commit()
 # q.close()
@@ -40,6 +42,23 @@ def log(message):
                                                           message.from_user.last_name,
                                                           str(message.from_user.id), message.text))
 
+
+def request_zaraz_travel(message):
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("SELECT * from user WHERE id='%s'" % message.from_user.id)
+    results = q.fetchall()
+    # /html/body/main/section[2]/div/div/div[2]/div/div[2]/div[1]/div/div/div/div[2]/div[1]/div[1]/div/div[2]/div[1]/p
+    # //*[@id="ssam-theme-default-town-to-box"]/div[2]/div[1]/p
+    connection.commit()
+    q.close()
+    connection.close()
+    driver = webdriver.Chrome('C:\\Users\Alexeii\PycharmProjects\ChromeDriver\chromedriver.exe')
+    time.sleep(3)
+    driver.get("https://zaraz.travel/")
+    driver.find_element_by_xpath('//*[@id="ssam-theme-default-town-to-box"]/div[1]/span').click()
+    time.sleep(3)
+    driver.quit()
 
 def ask_from(message):
     button1 = types.KeyboardButton('🇺🇦Київ')
@@ -115,6 +134,18 @@ def hotel_stars(message):
     bot.send_message(message.chat.id, 'Оберіть кількість зірок готелю🏨', reply_markup=markup)
 
 
+def expected_cost(message):
+    button1 = types.KeyboardButton('💵0-300$')
+    button2 = types.KeyboardButton('💵300-600$')
+    button3 = types.KeyboardButton('💵600-900$')
+    button4 = types.KeyboardButton('💵900-1200$')
+    button5 = types.KeyboardButton('💵1200-1500$')
+    button6 = types.KeyboardButton('💵Від 1500$')
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True, row_width=2)
+    markup.add(button1, button2, button3, button4, button5, button6)
+    bot.send_message(message.chat.id, 'Оберіть початкову вартість туру💸', reply_markup=markup)
+
+
 # creating our bot
 bot = telebot.TeleBot(config.TOKEN)
 
@@ -133,6 +164,14 @@ def calendar_callback_handler(q: types.CallbackQuery):
             bot.edit_message_text(text=f'Обрана дата: {picked_data}', chat_id=q.from_user.id,
                                   message_id=q.message.message_id,
                                   reply_markup=inline_calendar.get_keyboard(q.from_user.id))
+            connection = sql.connect('DATABASE.sqlite')
+            q1 = connection.cursor()
+            db_picked_data = str(str(picked_data).split('-')[2]) + '.' + str(str(picked_data).split('-')[1])
+            print(db_picked_data)
+            q1.execute("UPDATE user SET date_from='%s' WHERE id='%s'" % (db_picked_data, q.from_user.id))
+            connection.commit()
+            q1.close()
+            connection.close()
             button1 = types.KeyboardButton('Від 1🌙')
             button2 = types.KeyboardButton('Від 3🌙')
             button3 = types.KeyboardButton('Від 5🌙')
@@ -172,6 +211,15 @@ def rules(message):
 @bot.message_handler(commands=['start'])
 def start(message):
     log(message)
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("SELECT EXISTS(SELECT 1 FROM user WHERE id='%s')" % message.from_user.id)
+    results1 = q.fetchone()
+    if results1[0] != 1:
+        q.execute("INSERT INTO 'user' (id) VALUES ('%s')" % message.from_user.id)
+    connection.commit()
+    q.close()
+    connection.close()
     bot.send_chat_action(message.chat.id, action='typing')
     time.sleep(1)
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2, one_time_keyboard=True)
@@ -206,269 +254,565 @@ def start(message):
     bot.send_message(message.chat.id,
                      'Добридень {0.first_name}, вас вітає бот для знаходження та порівняння подорожей-{1.first_name}✈🏝\nОберіть країну👇'.format(
                          message.from_user, bot.get_me()), reply_markup=markup)
-    # driver = webdriver.Chrome('C:\\Users\Alexeii\PycharmProjects\ChromeDriver\chromedriver.exe')
-    # time.sleep(3)
-    # driver.get("https://zaraz.travel/")
-    # driver.find_element_by_xpath('//*[@id="ssam-theme-default-town-to-box"]/div[1]/span').click()
-    # time.sleep(3)
-    # driver.quit()
 
 
 @bot.message_handler(func=lambda message: message.text == '🇦🇿Азербайджан')
 def send_calendar(message):
     log(message)
+    country = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     ask_from(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇦🇱Албания')
 def send_calendar(message):
     log(message)
+    country = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     ask_from(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇧🇬Болгария')
 def send_calendar(message):
     log(message)
+    country = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     ask_from(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇬🇷Греция')
 def send_calendar(message):
     log(message)
+    country = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     ask_from(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇬🇪Грузия')
 def send_calendar(message):
     log(message)
+    country = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     ask_from(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇩🇴Доминиканская республика')
 def send_calendar(message):
     log(message)
+    country = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     ask_from(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇪🇬Египет')
 def send_calendar(message):
     log(message)
+    country = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     ask_from(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇮🇱Израиль')
 def send_calendar(message):
     log(message)
+    country = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     ask_from(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇮🇩Индонезия')
 def send_calendar(message):
     log(message)
+    country = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     ask_from(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇪🇸Испания')
 def send_calendar(message):
     log(message)
+    country = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     ask_from(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇮🇹Италия')
 def send_calendar(message):
     log(message)
+    country = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     ask_from(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇨🇾Кипр')
 def send_calendar(message):
     log(message)
+    country = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     ask_from(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇨🇳Китай')
 def send_calendar(message):
     log(message)
+    country = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     ask_from(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇨🇺Куба')
 def send_calendar(message):
     log(message)
+    country = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     ask_from(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇲🇾Малайзия')
 def send_calendar(message):
     log(message)
+    country = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     ask_from(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇲🇻Мальдивы')
 def send_calendar(message):
     log(message)
+    country = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     ask_from(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇲🇦Марокко')
 def send_calendar(message):
     log(message)
+    country = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     ask_from(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇦🇪ОАЭ')
 def send_calendar(message):
     log(message)
+    country = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     ask_from(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇴🇲Оман')
 def send_calendar(message):
     log(message)
+    country = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     ask_from(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇵🇹Португалия')
 def send_calendar(message):
     log(message)
+    country = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     ask_from(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇹🇭Таиланд')
 def send_calendar(message):
     log(message)
+    country = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     ask_from(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇹🇳Тунис')
 def send_calendar(message):
     log(message)
+    country = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     ask_from(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇹🇷Турция')
 def send_calendar(message):
     log(message)
+    country = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     ask_from(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇭🇷Хорватия')
 def send_calendar(message):
     log(message)
+    country = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     ask_from(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇱🇰Шри-Ланка')
 def send_calendar(message):
     log(message)
+    country = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     ask_from(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇺🇦Київ')
 def ask_date_from(message):
     log(message)
+    city = message.text
+    print(city[2:])
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET city='%s' WHERE id='%s'" % (city[2:], message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     ask_when(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇺🇦Запоріжжя')
 def ask_date_from(message):
     log(message)
+    city = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET city='%s' WHERE id='%s'" % (city[2:], message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     ask_when(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇺🇦Львів')
 def ask_date_from(message):
     log(message)
+    city = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET city='%s' WHERE id='%s'" % (city[2:], message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     ask_when(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇺🇦Одесса')
 def ask_date_from(message):
     log(message)
+    city = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET city='%s' WHERE id='%s'" % (city[2:], message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     ask_when(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇺🇦Харків')
 def ask_date_from(message):
     log(message)
+    city = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET city='%s' WHERE id='%s'" % (city[2:], message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     ask_when(message)
 
 
 @bot.message_handler(func=lambda message: message.text == 'Від 1🌙')
 def ask_count_adult(message):
     log(message)
+    nights = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET nights='%s' WHERE id='%s'" % (nights[4], message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     count_of_adult(message)
 
 
 @bot.message_handler(func=lambda message: message.text == 'Від 3🌙')
 def ask_count_adult(message):
     log(message)
+    nights = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET nights='%s' WHERE id='%s'" % (nights[4], message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     count_of_adult(message)
 
 
 @bot.message_handler(func=lambda message: message.text == 'Від 5🌙')
 def ask_count_adult(message):
     log(message)
+    nights = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET nights='%s' WHERE id='%s'" % (nights[4], message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     count_of_adult(message)
 
 
 @bot.message_handler(func=lambda message: message.text == 'Від 7🌙')
 def ask_count_adult(message):
     log(message)
+    nights = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET nights='%s' WHERE id='%s'" % (nights[4], message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     count_of_adult(message)
 
 
 @bot.message_handler(func=lambda message: message.text == 'Від 9🌙')
 def ask_count_adult(message):
     log(message)
+    nights = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET nights='%s' WHERE id='%s'" % (nights[4], message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     count_of_adult(message)
 
 
 @bot.message_handler(func=lambda message: message.text == 'Від 11🌙')
 def ask_count_adult(message):
     log(message)
+    nights = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET nights='%s' WHERE id='%s'" % (nights[4], message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     count_of_adult(message)
 
 
 @bot.message_handler(func=lambda message: message.text == 'Від 14🌙')
 def ask_count_adult(message):
     log(message)
+    nights = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET nights='%s' WHERE id='%s'" % (nights[4], message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     count_of_adult(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '👤')
 def ask_count_child(message):
     log(message)
+    adults = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET adults='%s' WHERE id='%s'" % (len(adults), message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     count_of_child(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '👤👤')
 def ask_count_child(message):
     log(message)
+    adults = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET adults='%s' WHERE id='%s'" % (len(adults), message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     count_of_child(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '👤👤👤')
 def ask_count_child(message):
     log(message)
+    adults = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET adults='%s' WHERE id='%s'" % (len(adults), message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     count_of_child(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '👤👤👤👤')
 def ask_count_child(message):
     log(message)
+    adults = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET adults='%s' WHERE id='%s'" % (len(adults), message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     count_of_child(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '👶')
 def ask_child_age(message):
     log(message)
+    childs = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET childs='%s' WHERE id='%s'" % (len(childs), message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     child_age(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '👶👶')
 def ask_child_age(message):
     log(message)
+    childs = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET childs='%s' WHERE id='%s'" % (len(childs), message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     child_age(message)
     # TODO: Придумать как записывать несколько возрастов
 
@@ -476,33 +820,146 @@ def ask_child_age(message):
 @bot.message_handler(func=lambda message: message.text == '👶👶👶')
 def ask_child_age(message):
     log(message)
+    childs = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET childs='%s' WHERE id='%s'" % (len(childs), message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     child_age(message)
 
 
 @bot.message_handler(func=lambda message: message.text == 'Без дітей')
 def ask_child_age(message):
     log(message)
+    childs = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET childs='%s' WHERE id='%s'" % ('0', message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
     hotel_stars(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '⭐⭐')
 def get_stars(message):
     log(message)
+    stars = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET stars='%s' WHERE id='%s'" % (len(stars), message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
+    expected_cost(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '⭐⭐⭐')
 def get_stars(message):
     log(message)
+    stars = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET stars='%s' WHERE id='%s'" % (len(stars), message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
+    expected_cost(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '⭐⭐⭐⭐')
 def get_stars(message):
     log(message)
+    stars = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET stars='%s' WHERE id='%s'" % (len(stars), message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
+    expected_cost(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '⭐⭐⭐⭐⭐')
 def get_stars(message):
     log(message)
+    stars = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET stars='%s' WHERE id='%s'" % (len(stars), message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
+    expected_cost(message)
+
+
+@bot.message_handler(func=lambda message: message.text == '💵0-300$')
+def get_cost(message):
+    log(message)
+    cost = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET cost='%s' WHERE id='%s'" % (cost[1:-1], message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
+
+
+@bot.message_handler(func=lambda message: message.text == '💵300-600$')
+def get_cost(message):
+    log(message)
+    cost = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET cost='%s' WHERE id='%s'" % (cost[1:-1], message.from_user.id))
+    connection.commit()
+    q.close()
+
+
+@bot.message_handler(func=lambda message: message.text == '💵600-900$')
+def get_cost(message):
+    log(message)
+    cost = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET cost='%s' WHERE id='%s'" % (cost[1:-1], message.from_user.id))
+    connection.commit()
+    q.close()
+
+
+@bot.message_handler(func=lambda message: message.text == '💵900-1200$')
+def get_cost(message):
+    log(message)
+    cost = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET cost='%s' WHERE id='%s'" % (cost[1:-1], message.from_user.id))
+    connection.commit()
+    q.close()
+
+
+@bot.message_handler(func=lambda message: message.text == '💵1200-1500$')
+def get_cost(message):
+    log(message)
+    cost = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET cost='%s' WHERE id='%s'" % (cost[1:-1], message.from_user.id))
+    connection.commit()
+    q.close()
+
+
+@bot.message_handler(func=lambda message: message.text == '💵Від 1500$')
+def get_cost(message):
+    log(message)
+    cost = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET cost='%s' WHERE id='%s'" % (cost[5:-1], message.from_user.id))
+    connection.commit()
+    q.close()
 
 
 # BOT RUNNING
