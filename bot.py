@@ -262,7 +262,7 @@ def send_calendar(message):
     country = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
-    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (f'{country[2:]},2000000087', message.from_user.id))
     connection.commit()
     q.close()
     connection.close()
@@ -275,7 +275,7 @@ def send_calendar(message):
     country = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
-    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (f'{country[2:]},2000000115', message.from_user.id))
     connection.commit()
     q.close()
     connection.close()
@@ -288,7 +288,7 @@ def send_calendar(message):
     country = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
-    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (f'{country[2:]},35', message.from_user.id))
     connection.commit()
     q.close()
     connection.close()
@@ -301,7 +301,7 @@ def send_calendar(message):
     country = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
-    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (f'{country[2:]},10', message.from_user.id))
     connection.commit()
     q.close()
     connection.close()
@@ -314,7 +314,7 @@ def send_calendar(message):
     country = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
-    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (f'{country[2:]},151', message.from_user.id))
     connection.commit()
     q.close()
     connection.close()
@@ -327,7 +327,7 @@ def send_calendar(message):
     country = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
-    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (f'{country[2:]},42', message.from_user.id))
     connection.commit()
     q.close()
     connection.close()
@@ -340,7 +340,7 @@ def send_calendar(message):
     country = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
-    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (f'{country[2:]},3', message.from_user.id))
     connection.commit()
     q.close()
     connection.close()
@@ -353,7 +353,7 @@ def send_calendar(message):
     country = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
-    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (f'{country[2:]},80', message.from_user.id))
     connection.commit()
     q.close()
     connection.close()
@@ -366,7 +366,7 @@ def send_calendar(message):
     country = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
-    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (f'{country[2:]},59', message.from_user.id))
     connection.commit()
     q.close()
     connection.close()
@@ -379,7 +379,7 @@ def send_calendar(message):
     country = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
-    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (f'{country[2:]},18', message.from_user.id))
     connection.commit()
     q.close()
     connection.close()
@@ -392,7 +392,7 @@ def send_calendar(message):
     country = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
-    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (f'{country[2:]},6', message.from_user.id))
     connection.commit()
     q.close()
     connection.close()
@@ -405,7 +405,7 @@ def send_calendar(message):
     country = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
-    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (f'{country[2:]},16', message.from_user.id))
     connection.commit()
     q.close()
     connection.close()
@@ -418,7 +418,7 @@ def send_calendar(message):
     country = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
-    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (f'{country[2:]},99', message.from_user.id))
     connection.commit()
     q.close()
     connection.close()
@@ -431,7 +431,7 @@ def send_calendar(message):
     country = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
-    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (f'{country[2:]},76', message.from_user.id))
     connection.commit()
     q.close()
     connection.close()
@@ -444,7 +444,7 @@ def send_calendar(message):
     country = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
-    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (f'{country[2:]},69', message.from_user.id))
     connection.commit()
     q.close()
     connection.close()
@@ -457,7 +457,7 @@ def send_calendar(message):
     country = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
-    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (f'{country[2:]},73', message.from_user.id))
     connection.commit()
     q.close()
     connection.close()
@@ -470,7 +470,7 @@ def send_calendar(message):
     country = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
-    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (f'{country[2:]},86', message.from_user.id))
     connection.commit()
     q.close()
     connection.close()
@@ -483,7 +483,7 @@ def send_calendar(message):
     country = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
-    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (f'{country[2:]},20', message.from_user.id))
     connection.commit()
     q.close()
     connection.close()
@@ -496,7 +496,7 @@ def send_calendar(message):
     country = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
-    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (f'{country[2:]},94', message.from_user.id))
     connection.commit()
     q.close()
     connection.close()
@@ -509,7 +509,7 @@ def send_calendar(message):
     country = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
-    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (f'{country[2:]},81', message.from_user.id))
     connection.commit()
     q.close()
     connection.close()
@@ -522,7 +522,7 @@ def send_calendar(message):
     country = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
-    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (f'{country[2:]},12', message.from_user.id))
     connection.commit()
     q.close()
     connection.close()
@@ -535,7 +535,7 @@ def send_calendar(message):
     country = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
-    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (f'{country[2:]},15', message.from_user.id))
     connection.commit()
     q.close()
     connection.close()
@@ -548,7 +548,7 @@ def send_calendar(message):
     country = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
-    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (f'{country[2:]},5', message.from_user.id))
     connection.commit()
     q.close()
     connection.close()
@@ -561,7 +561,7 @@ def send_calendar(message):
     country = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
-    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (f'{country[2:]},8', message.from_user.id))
     connection.commit()
     q.close()
     connection.close()
@@ -574,7 +574,7 @@ def send_calendar(message):
     country = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
-    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (country[2:], message.from_user.id))
+    q.execute("UPDATE user SET country='%s' WHERE id='%s'" % (f'{country[2:]},116', message.from_user.id))
     connection.commit()
     q.close()
     connection.close()
@@ -588,7 +588,7 @@ def ask_date_from(message):
     print(city[2:])
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
-    q.execute("UPDATE user SET city='%s' WHERE id='%s'" % (city[2:], message.from_user.id))
+    q.execute("UPDATE user SET city='%s' WHERE id='%s'" % (f'{city[2:]},149', message.from_user.id))
     connection.commit()
     q.close()
     connection.close()
@@ -601,7 +601,7 @@ def ask_date_from(message):
     city = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
-    q.execute("UPDATE user SET city='%s' WHERE id='%s'" % (city[2:], message.from_user.id))
+    q.execute("UPDATE user SET city='%s' WHERE id='%s'" % (f'{city[2:]},648', message.from_user.id))
     connection.commit()
     q.close()
     connection.close()
@@ -614,7 +614,7 @@ def ask_date_from(message):
     city = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
-    q.execute("UPDATE user SET city='%s' WHERE id='%s'" % (city[2:], message.from_user.id))
+    q.execute("UPDATE user SET city='%s' WHERE id='%s'" % (f'{city[2:]},534', message.from_user.id))
     connection.commit()
     q.close()
     connection.close()
@@ -627,7 +627,7 @@ def ask_date_from(message):
     city = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
-    q.execute("UPDATE user SET city='%s' WHERE id='%s'" % (city[2:], message.from_user.id))
+    q.execute("UPDATE user SET city='%s' WHERE id='%s'" % (f'{city[2:]},532', message.from_user.id))
     connection.commit()
     q.close()
     connection.close()
@@ -640,7 +640,7 @@ def ask_date_from(message):
     city = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
-    q.execute("UPDATE user SET city='%s' WHERE id='%s'" % (city[2:], message.from_user.id))
+    q.execute("UPDATE user SET city='%s' WHERE id='%s'" % (f'{city[2:]},146', message.from_user.id))
     connection.commit()
     q.close()
     connection.close()
