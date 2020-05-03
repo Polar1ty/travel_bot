@@ -14,6 +14,7 @@ import time
 import inline_calendar
 import random
 from selenium import webdriver
+import selenium
 
 
 # connection = sql.connect('DATABASE.sqlite')
@@ -48,17 +49,77 @@ def request_zaraz_travel(message):
     q = connection.cursor()
     q.execute("SELECT * from user WHERE id='%s'" % message.from_user.id)
     results = q.fetchall()
-    # /html/body/main/section[2]/div/div/div[2]/div/div[2]/div[1]/div/div/div/div[2]/div[1]/div[1]/div/div[2]/div[1]/p
-    # //*[@id="ssam-theme-default-town-to-box"]/div[2]/div[1]/p
+    print(results)
+    print(results[0][1].split(',')[1])
+    print(results[0][2].split(',')[1])
     connection.commit()
     q.close()
     connection.close()
     driver = webdriver.Chrome('C:\\Users\Alexeii\PycharmProjects\ChromeDriver\chromedriver.exe')
-    time.sleep(3)
     driver.get("https://zaraz.travel/")
-    driver.find_element_by_xpath('//*[@id="ssam-theme-default-town-to-box"]/div[1]/span').click()
-    time.sleep(3)
-    driver.quit()
+    country_set = driver.find_element_by_xpath('//*[@id="ssam-theme-default-town-to-box"]')
+    driver.execute_script(f"arguments[0].setAttribute('data-values','{results[0][1].split(',')[1]}')", country_set)  # set county code
+    city = driver.find_element_by_xpath('//*[@id="ssam-theme-default-town-from-box"]')
+    driver.execute_script(f"arguments[0].setAttribute('data-values','{results[0][2].split(',')[1]}')", city)  # set city code
+    fromfrom = driver.find_element_by_xpath('//*[@id="ssam-theme-default-search-box"]/div[1]/input[1]')
+    driver.execute_script(f"arguments[0].setAttribute('value','{results[0][3]}')", fromfrom)  # set fromfrom date
+    fromto = driver.find_element_by_xpath('//*[@id="ssam-theme-default-search-box"]/div[1]/input[2]')
+    driver.execute_script(f"arguments[0].setAttribute('value','{results[0][3]}')", fromto)  # set fromto date
+    # --------------- #
+    # Here should be set count of nights
+    # --------------- #
+    adults = driver.find_element_by_xpath('//*[@id="ssam-theme-default-search-box"]/div[1]/input[3]')
+    driver.execute_script(f"arguments[0].setAttribute('value','{results[0][5]}')", adults)  # set count_of adults
+    children = driver.find_element_by_xpath('//*[@id="ssam-theme-default-search-box"]/div[1]/input[4]')
+    driver.execute_script(f"arguments[0].setAttribute('value','{results[0][6]}')", children)  # set count of children
+    stars = driver.find_element_by_xpath('//*[@id="ssam-theme-default-category-box"]')
+    driver.execute_script(f"arguments[0].setAttribute('data-values','{results[0][7]}')", stars)  # set count of stars
+    driver.find_element_by_xpath('//*[@id="ssam-theme-default-search-box"]/div[5]/button').click()  # Press Шукати
+    time.sleep(6.5)
+    # all_tours = driver.find_element_by_xpath('/html/body/main/section[2]/div/div/div[2]/div/div[2]/div[2]/div[2]/div/div/div[2]') # work!
+    print(driver.find_elements_by_xpath(
+        '/html/body/main/section[2]/div/div/div[2]/div/div[2]/div[2]/div[2]/div/div/div[2]/div[1]/div/div/div[2]/div[3]/div[2]/a'))
+    if driver.find_elements_by_xpath('/html/body/main/section[2]/div/div/div[2]/div/div[2]/div[2]/div[2]/div/div/div[2]/div[1]/div/div/div[2]/div[3]/div[2]/a') == []:
+        print('Ничего не найдено')
+        all_tours = []
+    else:
+        all_tours = []
+        for i in range(1, 27):
+            try:
+                url = driver.find_element_by_xpath(
+                    f'/html/body/main/section[2]/div/div/div[2]/div/div[2]/div[2]/div[2]/div/div/div[2]/div[{i}]/div/div/div[2]/div[3]/div[2]/a').get_attribute(
+                    "href")
+                price = driver.find_element_by_xpath(
+                    f'/html/body/main/section[2]/div/div/div[2]/div/div[2]/div[2]/div[2]/div/div/div[2]/div[{i}]/div/div/div[2]/div[3]/div[2]/a').text
+                hotel = driver.find_element_by_xpath(
+                    f'/html/body/main/section[2]/div/div/div[2]/div/div[2]/div[2]/div[2]/div/div/div[2]/div[{i}]/div/div/div[2]/div[1]/a/p').text
+                date = driver.find_element_by_xpath(
+                    f'/html/body/main/section[2]/div/div/div[2]/div/div[2]/div[2]/div[2]/div/div/div[2]/div[{i}]/div/div/div[2]/div[2]/div[2]/p[2]').text
+                country = driver.find_element_by_xpath(
+                    f'/html/body/main/section[2]/div/div/div[2]/div/div[2]/div[2]/div[2]/div/div/div[2]/div[{i}]/div/div/div[2]/div[3]/div[1]/p/span').text
+                print(url)
+                print(price)
+                print(hotel)
+                print(date)
+                print(country)
+                dict = {
+                    'url': url,
+                    'price': price,
+                    'hotel': hotel,
+                    'date': date,
+                    'country': country
+                }
+                all_tours.append(dict)
+            except selenium.common.exceptions.NoSuchElementException:
+                pass
+    print(all_tours)
+    try:
+        for i in range(1, 6):
+            bot.send_message(message.chat.id, f'✈{all_tours[i]["country"]}\n🏝{all_tours[i]["hotel"]}\n📅{all_tours[i]["date"]}\n💵<a href="{all_tours[i]["url"]}">{all_tours[i]["price"]}</a>', parse_mode='HTML')
+    except IndexError:
+        bot.send_message(message.chat.id, 'По вашому запиту не знайдено жодних тарифів🤷‍\nСпробуйте ще🔁\nНапишіть /reset для перезапуску')
+
+        #  driver.quit()
 
 def ask_from(message):
     button1 = types.KeyboardButton('🇺🇦Київ')
@@ -166,7 +227,7 @@ def calendar_callback_handler(q: types.CallbackQuery):
                                   reply_markup=inline_calendar.get_keyboard(q.from_user.id))
             connection = sql.connect('DATABASE.sqlite')
             q1 = connection.cursor()
-            db_picked_data = str(str(picked_data).split('-')[2]) + '.' + str(str(picked_data).split('-')[1])
+            db_picked_data = str(str(picked_data).split('-')[2]) + '.' + str(str(picked_data).split('-')[1]) + '.' + str(str(picked_data).split('-')[0])
             print(db_picked_data)
             q1.execute("UPDATE user SET date_from='%s' WHERE id='%s'" % (db_picked_data, q.from_user.id))
             connection.commit()
@@ -898,6 +959,7 @@ def get_stars(message):
 @bot.message_handler(func=lambda message: message.text == '💵0-300$')
 def get_cost(message):
     log(message)
+    bot.send_message(message.chat.id, 'Формуємо вашу персональну підбірку📠\nЗачекайте⏳')
     cost = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
@@ -905,61 +967,72 @@ def get_cost(message):
     connection.commit()
     q.close()
     connection.close()
+    request_zaraz_travel(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '💵300-600$')
 def get_cost(message):
     log(message)
+    bot.send_message(message.chat.id, 'Формуємо вашу персональну підбірку📠\nЗачекайте⏳')
     cost = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
     q.execute("UPDATE user SET cost='%s' WHERE id='%s'" % (cost[1:-1], message.from_user.id))
     connection.commit()
     q.close()
+    request_zaraz_travel(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '💵600-900$')
 def get_cost(message):
     log(message)
+    bot.send_message(message.chat.id, 'Формуємо вашу персональну підбірку📠\nЗачекайте⏳')
     cost = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
     q.execute("UPDATE user SET cost='%s' WHERE id='%s'" % (cost[1:-1], message.from_user.id))
     connection.commit()
     q.close()
+    request_zaraz_travel(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '💵900-1200$')
 def get_cost(message):
     log(message)
+    bot.send_message(message.chat.id, 'Формуємо вашу персональну підбірку📠\nЗачекайте⏳')
     cost = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
     q.execute("UPDATE user SET cost='%s' WHERE id='%s'" % (cost[1:-1], message.from_user.id))
     connection.commit()
     q.close()
+    request_zaraz_travel(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '💵1200-1500$')
 def get_cost(message):
     log(message)
+    bot.send_message(message.chat.id, 'Формуємо вашу персональну підбірку📠\nЗачекайте⏳')
     cost = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
     q.execute("UPDATE user SET cost='%s' WHERE id='%s'" % (cost[1:-1], message.from_user.id))
     connection.commit()
     q.close()
+    request_zaraz_travel(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '💵Від 1500$')
 def get_cost(message):
     log(message)
+    bot.send_message(message.chat.id, 'Формуємо вашу персональну підбірку📠\nЗачекайте⏳')
     cost = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
     q.execute("UPDATE user SET cost='%s' WHERE id='%s'" % (cost[5:-1], message.from_user.id))
     connection.commit()
     q.close()
+    request_zaraz_travel(message)
 
 
 # BOT RUNNING
