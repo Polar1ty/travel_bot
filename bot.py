@@ -29,11 +29,16 @@ import selenium
 # 				'adults' TEXT,
 # 				'childs' TEXT,
 # 				'stars' TEXT,
-# 				'cost' TEXT
+# 				'cost' TEXT,
+# 				'age1' TEXT,
+# 				'age2' TEXT,
+# 				'age3' TEXT
 # 			)''')
 # connection.commit()
 # q.close()
 # connection.close()
+
+utility = {}
 
 def log(message):
     """ Logging user messages """
@@ -50,8 +55,6 @@ def request_zaraz_travel(message):
     q.execute("SELECT * from user WHERE id='%s'" % message.from_user.id)
     results = q.fetchall()
     print(results)
-    print(results[0][1].split(',')[1])
-    print(results[0][2].split(',')[1])
     connection.commit()
     q.close()
     connection.close()
@@ -73,6 +76,21 @@ def request_zaraz_travel(message):
     children = driver.find_element_by_xpath('//*[@id="ssam-theme-default-search-box"]/div[1]/input[4]')
     driver.execute_script(f"arguments[0].setAttribute('value','{results[0][6]}')", children)  # set count of children
     stars = driver.find_element_by_xpath('//*[@id="ssam-theme-default-category-box"]')
+    if results[0][6] == 1:
+        age1 = driver.find_element_by_xpath('//*[@id="ssam-theme-default-search-box"]/div[1]/input[5]')
+        driver.execute_script(f"arguments[0].setAttribute('value','{results[0][9]}')", age1)  # set age1 of children
+    elif results[0][6] == 2:
+        age1 = driver.find_element_by_xpath('//*[@id="ssam-theme-default-search-box"]/div[1]/input[5]')
+        driver.execute_script(f"arguments[0].setAttribute('value','{results[0][9]}')", age1)  # set age1 of children
+        age2 = driver.find_element_by_xpath('//*[@id="ssam-theme-default-search-box"]/div[1]/input[6]')
+        driver.execute_script(f"arguments[0].setAttribute('value','{results[0][10]}')", age2)  # set age2 of children
+    elif results[0][6] == 3:
+        age1 = driver.find_element_by_xpath('//*[@id="ssam-theme-default-search-box"]/div[1]/input[5]')
+        driver.execute_script(f"arguments[0].setAttribute('value','{results[0][9]}')", age1)  # set age1 of children
+        age2 = driver.find_element_by_xpath('//*[@id="ssam-theme-default-search-box"]/div[1]/input[6]')
+        driver.execute_script(f"arguments[0].setAttribute('value','{results[0][10]}')", age2)  # set age2 of children
+        age3 = driver.find_element_by_xpath('//*[@id="ssam-theme-default-search-box"]/div[1]/input[7]')
+        driver.execute_script(f"arguments[0].setAttribute('value','{results[0][11]}')", age3)  # set age3 of children
     driver.execute_script(f"arguments[0].setAttribute('data-values','{results[0][7]}')", stars)  # set count of stars
     driver.find_element_by_xpath('//*[@id="ssam-theme-default-search-box"]/div[5]/button').click()  # Press Шукати
     time.sleep(6.5)
@@ -117,7 +135,7 @@ def request_zaraz_travel(message):
         for i in range(1, 6):
             bot.send_message(message.chat.id, f'✈{all_tours[i]["country"]}\n🏝{all_tours[i]["hotel"]}\n📅{all_tours[i]["date"]}\n💵<a href="{all_tours[i]["url"]}">{all_tours[i]["price"]}</a>', parse_mode='HTML')
     except IndexError:
-        bot.send_message(message.chat.id, 'По вашому запиту не знайдено жодних тарифів🤷‍\nСпробуйте ще🔁\nНапишіть /reset для перезапуску')
+        bot.send_message(message.chat.id, 'По вашому запиту не знайдено жодних тарифів🤷‍\nСпробуйте змінити критерії пошуку🔁\nНапишіть /reset для перезапуску')
 
         #  driver.quit()
 
@@ -183,6 +201,52 @@ def child_age(message):
     markup.add(button1, button2, button3, button4, button5, button6, button7, button8, button9, button10, button11,
                button12, button13, button14, button15)
     bot.send_message(message.chat.id, 'Оберіть вік дитини:', reply_markup=markup)
+
+
+def child_age2(message):
+    button1 = types.KeyboardButton('2 роки')
+    button2 = types.KeyboardButton('3 роки')
+    button3 = types.KeyboardButton('4 роки')
+    button4 = types.KeyboardButton('5 років')
+    button5 = types.KeyboardButton('6 років')
+    button6 = types.KeyboardButton('7 років')
+    button7 = types.KeyboardButton('8 років')
+    button8 = types.KeyboardButton('9 років')
+    button9 = types.KeyboardButton('10 років')
+    button10 = types.KeyboardButton('11 років')
+    button11 = types.KeyboardButton('12 років')
+    button12 = types.KeyboardButton('13 років')
+    button13 = types.KeyboardButton('14 років')
+    button14 = types.KeyboardButton('15 років')
+    button15 = types.KeyboardButton('16 років')
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+    markup.add(button1, button2, button3, button4, button5, button6, button7, button8, button9, button10, button11,
+               button12, button13, button14, button15)
+    bot.send_message(message.chat.id, 'Оберіть вік другої дитини:', reply_markup=markup)
+    utility.update({str(message.from_user.id) + 'c_age2': '1'})
+
+
+def child_age3(message):
+    button1 = types.KeyboardButton('2 роки')
+    button2 = types.KeyboardButton('3 роки')
+    button3 = types.KeyboardButton('4 роки')
+    button4 = types.KeyboardButton('5 років')
+    button5 = types.KeyboardButton('6 років')
+    button6 = types.KeyboardButton('7 років')
+    button7 = types.KeyboardButton('8 років')
+    button8 = types.KeyboardButton('9 років')
+    button9 = types.KeyboardButton('10 років')
+    button10 = types.KeyboardButton('11 років')
+    button11 = types.KeyboardButton('12 років')
+    button12 = types.KeyboardButton('13 років')
+    button13 = types.KeyboardButton('14 років')
+    button14 = types.KeyboardButton('15 років')
+    button15 = types.KeyboardButton('16 років')
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+    markup.add(button1, button2, button3, button4, button5, button6, button7, button8, button9, button10, button11,
+               button12, button13, button14, button15)
+    bot.send_message(message.chat.id, 'Оберіть вік третьої дитини:', reply_markup=markup)
+    utility.update({str(message.from_user.id) + 'c_age3': '1'})
 
 
 def hotel_stars(message):
@@ -252,6 +316,11 @@ def calendar_callback_handler(q: types.CallbackQuery):
 def reset(message):
     """ Clear all unnecessary data from utility dict """
     log(message)
+    try:
+        utility.pop(str(message.chat.id) + 'c_age2')
+        utility.pop(str(message.chat.id) + 'c_age3')
+    except KeyError:
+        pass
     bot.send_message(message.chat.id, 'Бот готовий до повторного використання. Напишіть /start')
 
 
@@ -315,6 +384,10 @@ def start(message):
     bot.send_message(message.chat.id,
                      'Добридень {0.first_name}, вас вітає бот для знаходження та порівняння подорожей-{1.first_name}✈🏝\nОберіть країну👇'.format(
                          message.from_user, bot.get_me()), reply_markup=markup)
+    utility = {
+        'c_age2': '',
+        'c_age3': ''
+    }
 
 
 @bot.message_handler(func=lambda message: message.text == '🇦🇿Азербайджан')
@@ -902,6 +975,636 @@ def ask_child_age(message):
     q.close()
     connection.close()
     hotel_stars(message)
+
+
+@bot.message_handler(func=lambda message: message.text == '2 роки')
+def get_child_age(message):
+    log(message)
+    age = message.text.split(' ')[0]
+    if utility.get(str(message.chat.id) + 'c_age3') == '1':
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age3='%s' WHERE id='%s'" % (age, message.from_user.id))
+        connection.commit()
+        q.close()
+        connection.close()
+        hotel_stars(message)
+    elif utility.get(str(message.chat.id) + 'c_age2') == '1':
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age2='%s' WHERE id='%s'" % (age, message.from_user.id))
+        q.execute("SELECT * from user WHERE id='%s'" % message.from_user.id)
+        results = q.fetchall()
+        connection.commit()
+        q.close()
+        connection.close()
+        utility.pop(str(message.chat.id) + 'c_age2')
+        if results[0][6] == '3':
+            child_age3(message)
+        else:
+            hotel_stars(message)
+    else:
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age1='%s' WHERE id='%s'" % (age, message.from_user.id))
+        q.execute("SELECT * from user WHERE id='%s'" % message.from_user.id)
+        results = q.fetchall()
+        connection.commit()
+        q.close()
+        connection.close()
+        print(results[0][6])
+        if results[0][6] == '2' or results[0][6] == '3':
+            child_age2(message)
+        else:
+            hotel_stars(message)
+
+
+@bot.message_handler(func=lambda message: message.text == '3 роки')
+def get_child_age(message):
+    log(message)
+    age = message.text.split(' ')[0]
+    if utility.get(str(message.chat.id) + 'c_age3') == '1':
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age3='%s' WHERE id='%s'" % (age, message.from_user.id))
+        connection.commit()
+        q.close()
+        connection.close()
+        hotel_stars(message)
+    elif utility.get(str(message.chat.id) + 'c_age2') == '1':
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age2='%s' WHERE id='%s'" % (age, message.from_user.id))
+        q.execute("SELECT * from user WHERE id='%s'" % message.from_user.id)
+        results = q.fetchall()
+        connection.commit()
+        q.close()
+        connection.close()
+        utility.pop(str(message.chat.id) + 'c_age2')
+        if results[0][6] == '3':
+            child_age3(message)
+        else:
+            hotel_stars(message)
+    else:
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age1='%s' WHERE id='%s'" % (age, message.from_user.id))
+        q.execute("SELECT * from user WHERE id='%s'" % message.from_user.id)
+        results = q.fetchall()
+        connection.commit()
+        q.close()
+        connection.close()
+        print(results[0][6])
+        if results[0][6] == '2' or results[0][6] == '3':
+            child_age2(message)
+        else:
+            hotel_stars(message)
+
+
+@bot.message_handler(func=lambda message: message.text == '4 роки')
+def get_child_age(message):
+    log(message)
+    age = message.text.split(' ')[0]
+    if utility.get(str(message.chat.id) + 'c_age3') == '1':
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age3='%s' WHERE id='%s'" % (age, message.from_user.id))
+        connection.commit()
+        q.close()
+        connection.close()
+        hotel_stars(message)
+    elif utility.get(str(message.chat.id) + 'c_age2') == '1':
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age2='%s' WHERE id='%s'" % (age, message.from_user.id))
+        q.execute("SELECT * from user WHERE id='%s'" % message.from_user.id)
+        results = q.fetchall()
+        connection.commit()
+        q.close()
+        connection.close()
+        utility.pop(str(message.chat.id) + 'c_age2')
+        if results[0][6] == '3':
+            child_age3(message)
+        else:
+            hotel_stars(message)
+    else:
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age1='%s' WHERE id='%s'" % (age, message.from_user.id))
+        q.execute("SELECT * from user WHERE id='%s'" % message.from_user.id)
+        results = q.fetchall()
+        connection.commit()
+        q.close()
+        connection.close()
+        print(results[0][6])
+        if results[0][6] == '2' or results[0][6] == '3':
+            child_age2(message)
+        else:
+            hotel_stars(message)
+
+
+@bot.message_handler(func=lambda message: message.text == '5 років')
+def get_child_age(message):
+    log(message)
+    age = message.text.split(' ')[0]
+    if utility.get(str(message.chat.id) + 'c_age3') == '1':
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age3='%s' WHERE id='%s'" % (age, message.from_user.id))
+        connection.commit()
+        q.close()
+        connection.close()
+        hotel_stars(message)
+    elif utility.get(str(message.chat.id) + 'c_age2') == '1':
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age2='%s' WHERE id='%s'" % (age, message.from_user.id))
+        q.execute("SELECT * from user WHERE id='%s'" % message.from_user.id)
+        results = q.fetchall()
+        connection.commit()
+        q.close()
+        connection.close()
+        utility.pop(str(message.chat.id) + 'c_age2')
+        if results[0][6] == '3':
+            child_age3(message)
+        else:
+            hotel_stars(message)
+    else:
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age1='%s' WHERE id='%s'" % (age, message.from_user.id))
+        q.execute("SELECT * from user WHERE id='%s'" % message.from_user.id)
+        results = q.fetchall()
+        connection.commit()
+        q.close()
+        connection.close()
+        print(results[0][6])
+        if results[0][6] == '2' or results[0][6] == '3':
+            child_age2(message)
+        else:
+            hotel_stars(message)
+
+
+@bot.message_handler(func=lambda message: message.text == '6 років')
+def get_child_age(message):
+    log(message)
+    age = message.text.split(' ')[0]
+    if utility.get(str(message.chat.id) + 'c_age3') == '1':
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age3='%s' WHERE id='%s'" % (age, message.from_user.id))
+        connection.commit()
+        q.close()
+        connection.close()
+        hotel_stars(message)
+    elif utility.get(str(message.chat.id) + 'c_age2') == '1':
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age2='%s' WHERE id='%s'" % (age, message.from_user.id))
+        q.execute("SELECT * from user WHERE id='%s'" % message.from_user.id)
+        results = q.fetchall()
+        connection.commit()
+        q.close()
+        connection.close()
+        utility.pop(str(message.chat.id) + 'c_age2')
+        if results[0][6] == '3':
+            child_age3(message)
+        else:
+            hotel_stars(message)
+    else:
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age1='%s' WHERE id='%s'" % (age, message.from_user.id))
+        q.execute("SELECT * from user WHERE id='%s'" % message.from_user.id)
+        results = q.fetchall()
+        connection.commit()
+        q.close()
+        connection.close()
+        print(results[0][6])
+        if results[0][6] == '2' or results[0][6] == '3':
+            child_age2(message)
+        else:
+            hotel_stars(message)
+
+
+@bot.message_handler(func=lambda message: message.text == '7 років')
+def get_child_age(message):
+    log(message)
+    age = message.text.split(' ')[0]
+    if utility.get(str(message.chat.id) + 'c_age3') == '1':
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age3='%s' WHERE id='%s'" % (age, message.from_user.id))
+        connection.commit()
+        q.close()
+        connection.close()
+        hotel_stars(message)
+    elif utility.get(str(message.chat.id) + 'c_age2') == '1':
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age2='%s' WHERE id='%s'" % (age, message.from_user.id))
+        q.execute("SELECT * from user WHERE id='%s'" % message.from_user.id)
+        results = q.fetchall()
+        connection.commit()
+        q.close()
+        connection.close()
+        utility.pop(str(message.chat.id) + 'c_age2')
+        if results[0][6] == '3':
+            child_age3(message)
+        else:
+            hotel_stars(message)
+    else:
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age1='%s' WHERE id='%s'" % (age, message.from_user.id))
+        q.execute("SELECT * from user WHERE id='%s'" % message.from_user.id)
+        results = q.fetchall()
+        connection.commit()
+        q.close()
+        connection.close()
+        print(results[0][6])
+        if results[0][6] == '2' or results[0][6] == '3':
+            child_age2(message)
+        else:
+            hotel_stars(message)
+
+
+@bot.message_handler(func=lambda message: message.text == '8 років')
+def get_child_age(message):
+    log(message)
+    age = message.text.split(' ')[0]
+    if utility.get(str(message.chat.id) + 'c_age3') == '1':
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age3='%s' WHERE id='%s'" % (age, message.from_user.id))
+        connection.commit()
+        q.close()
+        connection.close()
+        hotel_stars(message)
+    elif utility.get(str(message.chat.id) + 'c_age2') == '1':
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age2='%s' WHERE id='%s'" % (age, message.from_user.id))
+        q.execute("SELECT * from user WHERE id='%s'" % message.from_user.id)
+        results = q.fetchall()
+        connection.commit()
+        q.close()
+        connection.close()
+        utility.pop(str(message.chat.id) + 'c_age2')
+        if results[0][6] == '3':
+            child_age3(message)
+        else:
+            hotel_stars(message)
+    else:
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age1='%s' WHERE id='%s'" % (age, message.from_user.id))
+        q.execute("SELECT * from user WHERE id='%s'" % message.from_user.id)
+        results = q.fetchall()
+        connection.commit()
+        q.close()
+        connection.close()
+        print(results[0][6])
+        if results[0][6] == '2' or results[0][6] == '3':
+            child_age2(message)
+        else:
+            hotel_stars(message)
+
+
+@bot.message_handler(func=lambda message: message.text == '9 років')
+def get_child_age(message):
+    log(message)
+    age = message.text.split(' ')[0]
+    if utility.get(str(message.chat.id) + 'c_age3') == '1':
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age3='%s' WHERE id='%s'" % (age, message.from_user.id))
+        connection.commit()
+        q.close()
+        connection.close()
+        hotel_stars(message)
+    elif utility.get(str(message.chat.id) + 'c_age2') == '1':
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age2='%s' WHERE id='%s'" % (age, message.from_user.id))
+        q.execute("SELECT * from user WHERE id='%s'" % message.from_user.id)
+        results = q.fetchall()
+        connection.commit()
+        q.close()
+        connection.close()
+        utility.pop(str(message.chat.id) + 'c_age2')
+        if results[0][6] == '3':
+            child_age3(message)
+        else:
+            hotel_stars(message)
+    else:
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age1='%s' WHERE id='%s'" % (age, message.from_user.id))
+        q.execute("SELECT * from user WHERE id='%s'" % message.from_user.id)
+        results = q.fetchall()
+        connection.commit()
+        q.close()
+        connection.close()
+        print(results[0][6])
+        if results[0][6] == '2' or results[0][6] == '3':
+            child_age2(message)
+        else:
+            hotel_stars(message)
+
+
+@bot.message_handler(func=lambda message: message.text == '10 років')
+def get_child_age(message):
+    log(message)
+    age = message.text.split(' ')[0]
+    if utility.get(str(message.chat.id) + 'c_age3') == '1':
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age3='%s' WHERE id='%s'" % (age, message.from_user.id))
+        connection.commit()
+        q.close()
+        connection.close()
+        hotel_stars(message)
+    elif utility.get(str(message.chat.id) + 'c_age2') == '1':
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age2='%s' WHERE id='%s'" % (age, message.from_user.id))
+        q.execute("SELECT * from user WHERE id='%s'" % message.from_user.id)
+        results = q.fetchall()
+        connection.commit()
+        q.close()
+        connection.close()
+        utility.pop(str(message.chat.id) + 'c_age2')
+        if results[0][6] == '3':
+            child_age3(message)
+        else:
+            hotel_stars(message)
+    else:
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age1='%s' WHERE id='%s'" % (age, message.from_user.id))
+        q.execute("SELECT * from user WHERE id='%s'" % message.from_user.id)
+        results = q.fetchall()
+        connection.commit()
+        q.close()
+        connection.close()
+        print(results[0][6])
+        if results[0][6] == '2' or results[0][6] == '3':
+            child_age2(message)
+        else:
+            hotel_stars(message)
+
+
+@bot.message_handler(func=lambda message: message.text == '11 років')
+def get_child_age(message):
+    log(message)
+    age = message.text.split(' ')[0]
+    if utility.get(str(message.chat.id) + 'c_age3') == '1':
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age3='%s' WHERE id='%s'" % (age, message.from_user.id))
+        connection.commit()
+        q.close()
+        connection.close()
+        hotel_stars(message)
+    elif utility.get(str(message.chat.id) + 'c_age2') == '1':
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age2='%s' WHERE id='%s'" % (age, message.from_user.id))
+        q.execute("SELECT * from user WHERE id='%s'" % message.from_user.id)
+        results = q.fetchall()
+        connection.commit()
+        q.close()
+        connection.close()
+        utility.pop(str(message.chat.id) + 'c_age2')
+        if results[0][6] == '3':
+            child_age3(message)
+        else:
+            hotel_stars(message)
+    else:
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age1='%s' WHERE id='%s'" % (age, message.from_user.id))
+        q.execute("SELECT * from user WHERE id='%s'" % message.from_user.id)
+        results = q.fetchall()
+        connection.commit()
+        q.close()
+        connection.close()
+        print(results[0][6])
+        if results[0][6] == '2' or results[0][6] == '3':
+            child_age2(message)
+        else:
+            hotel_stars(message)
+
+
+@bot.message_handler(func=lambda message: message.text == '12 років')
+def get_child_age(message):
+    log(message)
+    age = message.text.split(' ')[0]
+    if utility.get(str(message.chat.id) + 'c_age3') == '1':
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age3='%s' WHERE id='%s'" % (age, message.from_user.id))
+        connection.commit()
+        q.close()
+        connection.close()
+        hotel_stars(message)
+    elif utility.get(str(message.chat.id) + 'c_age2') == '1':
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age2='%s' WHERE id='%s'" % (age, message.from_user.id))
+        q.execute("SELECT * from user WHERE id='%s'" % message.from_user.id)
+        results = q.fetchall()
+        connection.commit()
+        q.close()
+        connection.close()
+        utility.pop(str(message.chat.id) + 'c_age2')
+        if results[0][6] == '3':
+            child_age3(message)
+        else:
+            hotel_stars(message)
+    else:
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age1='%s' WHERE id='%s'" % (age, message.from_user.id))
+        q.execute("SELECT * from user WHERE id='%s'" % message.from_user.id)
+        results = q.fetchall()
+        connection.commit()
+        q.close()
+        connection.close()
+        print(results[0][6])
+        if results[0][6] == '2' or results[0][6] == '3':
+            child_age2(message)
+        else:
+            hotel_stars(message)
+
+
+@bot.message_handler(func=lambda message: message.text == '13 років')
+def get_child_age(message):
+    log(message)
+    age = message.text.split(' ')[0]
+    if utility.get(str(message.chat.id) + 'c_age3') == '1':
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age3='%s' WHERE id='%s'" % (age, message.from_user.id))
+        connection.commit()
+        q.close()
+        connection.close()
+        hotel_stars(message)
+    elif utility.get(str(message.chat.id) + 'c_age2') == '1':
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age2='%s' WHERE id='%s'" % (age, message.from_user.id))
+        q.execute("SELECT * from user WHERE id='%s'" % message.from_user.id)
+        results = q.fetchall()
+        connection.commit()
+        q.close()
+        connection.close()
+        utility.pop(str(message.chat.id) + 'c_age2')
+        if results[0][6] == '3':
+            child_age3(message)
+        else:
+            hotel_stars(message)
+    else:
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age1='%s' WHERE id='%s'" % (age, message.from_user.id))
+        q.execute("SELECT * from user WHERE id='%s'" % message.from_user.id)
+        results = q.fetchall()
+        connection.commit()
+        q.close()
+        connection.close()
+        print(results[0][6])
+        if results[0][6] == '2' or results[0][6] == '3':
+            child_age2(message)
+        else:
+            hotel_stars(message)
+
+
+@bot.message_handler(func=lambda message: message.text == '14 років')
+def get_child_age(message):
+    log(message)
+    age = message.text.split(' ')[0]
+    if utility.get(str(message.chat.id) + 'c_age3') == '1':
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age3='%s' WHERE id='%s'" % (age, message.from_user.id))
+        connection.commit()
+        q.close()
+        connection.close()
+        hotel_stars(message)
+    elif utility.get(str(message.chat.id) + 'c_age2') == '1':
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age2='%s' WHERE id='%s'" % (age, message.from_user.id))
+        q.execute("SELECT * from user WHERE id='%s'" % message.from_user.id)
+        results = q.fetchall()
+        connection.commit()
+        q.close()
+        connection.close()
+        utility.pop(str(message.chat.id) + 'c_age2')
+        if results[0][6] == '3':
+            child_age3(message)
+        else:
+            hotel_stars(message)
+    else:
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age1='%s' WHERE id='%s'" % (age, message.from_user.id))
+        q.execute("SELECT * from user WHERE id='%s'" % message.from_user.id)
+        results = q.fetchall()
+        connection.commit()
+        q.close()
+        connection.close()
+        print(results[0][6])
+        if results[0][6] == '2' or results[0][6] == '3':
+            child_age2(message)
+        else:
+            hotel_stars(message)
+
+
+@bot.message_handler(func=lambda message: message.text == '15 років')
+def get_child_age(message):
+    log(message)
+    age = message.text.split(' ')[0]
+    if utility.get(str(message.chat.id) + 'c_age3') == '1':
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age3='%s' WHERE id='%s'" % (age, message.from_user.id))
+        connection.commit()
+        q.close()
+        connection.close()
+        hotel_stars(message)
+    elif utility.get(str(message.chat.id) + 'c_age2') == '1':
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age2='%s' WHERE id='%s'" % (age, message.from_user.id))
+        q.execute("SELECT * from user WHERE id='%s'" % message.from_user.id)
+        results = q.fetchall()
+        connection.commit()
+        q.close()
+        connection.close()
+        utility.pop(str(message.chat.id) + 'c_age2')
+        if results[0][6] == '3':
+            child_age3(message)
+        else:
+            hotel_stars(message)
+    else:
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age1='%s' WHERE id='%s'" % (age, message.from_user.id))
+        q.execute("SELECT * from user WHERE id='%s'" % message.from_user.id)
+        results = q.fetchall()
+        connection.commit()
+        q.close()
+        connection.close()
+        print(results[0][6])
+        if results[0][6] == '2' or results[0][6] == '3':
+            child_age2(message)
+        else:
+            hotel_stars(message)
+
+
+@bot.message_handler(func=lambda message: message.text == '16 років')
+def get_child_age(message):
+    log(message)
+    age = message.text.split(' ')[0]
+    if utility.get(str(message.chat.id) + 'c_age3') == '1':
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age3='%s' WHERE id='%s'" % (age, message.from_user.id))
+        connection.commit()
+        q.close()
+        connection.close()
+        hotel_stars(message)
+    elif utility.get(str(message.chat.id) + 'c_age2') == '1':
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age2='%s' WHERE id='%s'" % (age, message.from_user.id))
+        q.execute("SELECT * from user WHERE id='%s'" % message.from_user.id)
+        results = q.fetchall()
+        connection.commit()
+        q.close()
+        connection.close()
+        utility.pop(str(message.chat.id) + 'c_age2')
+        if results[0][6] == '3':
+            child_age3(message)
+        else:
+            hotel_stars(message)
+    else:
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET age1='%s' WHERE id='%s'" % (age, message.from_user.id))
+        q.execute("SELECT * from user WHERE id='%s'" % message.from_user.id)
+        results = q.fetchall()
+        connection.commit()
+        q.close()
+        connection.close()
+        print(results[0][6])
+        if results[0][6] == '2' or results[0][6] == '3':
+            child_age2(message)
+        else:
+            hotel_stars(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '⭐⭐')
