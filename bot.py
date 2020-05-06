@@ -70,6 +70,11 @@ def request_zaraz_travel(message):
     driver.execute_script(f"arguments[0].setAttribute('value','{results[0][3]}')", fromto)  # set fromto date
     # --------------- #
     # Here should be set count of nights
+    driver.find_element_by_xpath('//*[@id="ssam-theme-default-nights-box"]/div[1]/span').click()
+    time.sleep(0.5)
+    driver.find_element_by_xpath(f'//*[@id="lamaselect-custom-nights-from"]/option[{results[0][4]}]').click()  # click from nights
+    time.sleep(0.5)
+    driver.find_element_by_xpath(f'//*[@id="lamaselect-custom-nights-to"]/option[{results[0][4]}]').click()  # click to nights
     # --------------- #
     adults = driver.find_element_by_xpath('//*[@id="ssam-theme-default-search-box"]/div[1]/input[3]')
     driver.execute_script(f"arguments[0].setAttribute('value','{results[0][5]}')", adults)  # set count_of adults
@@ -132,12 +137,17 @@ def request_zaraz_travel(message):
                 pass
     print(all_tours)
     try:
+        tours_for_msg = []
         for i in range(1, 6):
-            bot.send_message(message.chat.id, f'✈{all_tours[i]["country"]}\n🏝{all_tours[i]["hotel"]}\n📅{all_tours[i]["date"]}\n💵<a href="{all_tours[i]["url"]}">{all_tours[i]["price"]}</a>', parse_mode='HTML')
+            tour = f'✈{all_tours[i]["country"]}\n🏝{all_tours[i]["hotel"]}\n📅{all_tours[i]["date"]}\n💵<a href="{all_tours[i]["url"]}">{all_tours[i]["price"]}</a>'
+            tours_for_msg.append(tour)
+        print(tours_for_msg)
+        bot.send_message(message.chat.id, text='\n\n'.join(tours_for_msg), parse_mode='HTML')
     except IndexError:
         bot.send_message(message.chat.id, 'По вашому запиту не знайдено жодних тарифів🤷‍\nСпробуйте змінити критерії пошуку🔁\nНапишіть /reset для перезапуску')
-
-        #  driver.quit()
+    tours_for_msg.clear()
+    all_tours.clear()
+    driver.quit()
 
 def ask_from(message):
     button1 = types.KeyboardButton('🇺🇦Київ')
@@ -259,16 +269,16 @@ def hotel_stars(message):
     bot.send_message(message.chat.id, 'Оберіть кількість зірок готелю🏨', reply_markup=markup)
 
 
-def expected_cost(message):
-    button1 = types.KeyboardButton('💵0-300$')
-    button2 = types.KeyboardButton('💵300-600$')
-    button3 = types.KeyboardButton('💵600-900$')
-    button4 = types.KeyboardButton('💵900-1200$')
-    button5 = types.KeyboardButton('💵1200-1500$')
-    button6 = types.KeyboardButton('💵Від 1500$')
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True, row_width=2)
-    markup.add(button1, button2, button3, button4, button5, button6)
-    bot.send_message(message.chat.id, 'Оберіть початкову вартість туру💸', reply_markup=markup)
+# def expected_cost(message):
+#     button1 = types.KeyboardButton('💵0-300$')
+#     button2 = types.KeyboardButton('💵300-600$')
+#     button3 = types.KeyboardButton('💵600-900$')
+#     button4 = types.KeyboardButton('💵900-1200$')
+#     button5 = types.KeyboardButton('💵1200-1500$')
+#     button6 = types.KeyboardButton('💵Від 1500$')
+#     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True, row_width=2)
+#     markup.add(button1, button2, button3, button4, button5, button6)
+#     bot.send_message(message.chat.id, 'Оберіть початкову вартість туру💸', reply_markup=markup)
 
 
 # creating our bot
@@ -948,7 +958,6 @@ def ask_child_age(message):
     q.close()
     connection.close()
     child_age(message)
-    # TODO: Придумать как записывать несколько возрастов
 
 
 @bot.message_handler(func=lambda message: message.text == '👶👶👶')
@@ -1617,7 +1626,8 @@ def get_stars(message):
     connection.commit()
     q.close()
     connection.close()
-    expected_cost(message)
+    bot.send_message(message.chat.id, 'Формуємо вашу персональну підбірку📠\nЗачекайте⏳')
+    request_zaraz_travel(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '⭐⭐⭐')
@@ -1630,7 +1640,8 @@ def get_stars(message):
     connection.commit()
     q.close()
     connection.close()
-    expected_cost(message)
+    bot.send_message(message.chat.id, 'Формуємо вашу персональну підбірку📠\nЗачекайте⏳')
+    request_zaraz_travel(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '⭐⭐⭐⭐')
@@ -1643,7 +1654,8 @@ def get_stars(message):
     connection.commit()
     q.close()
     connection.close()
-    expected_cost(message)
+    bot.send_message(message.chat.id, 'Формуємо вашу персональну підбірку📠\nЗачекайте⏳')
+    request_zaraz_travel(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '⭐⭐⭐⭐⭐')
@@ -1656,86 +1668,87 @@ def get_stars(message):
     connection.commit()
     q.close()
     connection.close()
-    expected_cost(message)
-
-
-@bot.message_handler(func=lambda message: message.text == '💵0-300$')
-def get_cost(message):
-    log(message)
     bot.send_message(message.chat.id, 'Формуємо вашу персональну підбірку📠\nЗачекайте⏳')
-    cost = message.text
-    connection = sql.connect('DATABASE.sqlite')
-    q = connection.cursor()
-    q.execute("UPDATE user SET cost='%s' WHERE id='%s'" % (cost[1:-1], message.from_user.id))
-    connection.commit()
-    q.close()
-    connection.close()
     request_zaraz_travel(message)
 
 
-@bot.message_handler(func=lambda message: message.text == '💵300-600$')
-def get_cost(message):
-    log(message)
-    bot.send_message(message.chat.id, 'Формуємо вашу персональну підбірку📠\nЗачекайте⏳')
-    cost = message.text
-    connection = sql.connect('DATABASE.sqlite')
-    q = connection.cursor()
-    q.execute("UPDATE user SET cost='%s' WHERE id='%s'" % (cost[1:-1], message.from_user.id))
-    connection.commit()
-    q.close()
-    request_zaraz_travel(message)
-
-
-@bot.message_handler(func=lambda message: message.text == '💵600-900$')
-def get_cost(message):
-    log(message)
-    bot.send_message(message.chat.id, 'Формуємо вашу персональну підбірку📠\nЗачекайте⏳')
-    cost = message.text
-    connection = sql.connect('DATABASE.sqlite')
-    q = connection.cursor()
-    q.execute("UPDATE user SET cost='%s' WHERE id='%s'" % (cost[1:-1], message.from_user.id))
-    connection.commit()
-    q.close()
-    request_zaraz_travel(message)
-
-
-@bot.message_handler(func=lambda message: message.text == '💵900-1200$')
-def get_cost(message):
-    log(message)
-    bot.send_message(message.chat.id, 'Формуємо вашу персональну підбірку📠\nЗачекайте⏳')
-    cost = message.text
-    connection = sql.connect('DATABASE.sqlite')
-    q = connection.cursor()
-    q.execute("UPDATE user SET cost='%s' WHERE id='%s'" % (cost[1:-1], message.from_user.id))
-    connection.commit()
-    q.close()
-    request_zaraz_travel(message)
-
-
-@bot.message_handler(func=lambda message: message.text == '💵1200-1500$')
-def get_cost(message):
-    log(message)
-    bot.send_message(message.chat.id, 'Формуємо вашу персональну підбірку📠\nЗачекайте⏳')
-    cost = message.text
-    connection = sql.connect('DATABASE.sqlite')
-    q = connection.cursor()
-    q.execute("UPDATE user SET cost='%s' WHERE id='%s'" % (cost[1:-1], message.from_user.id))
-    connection.commit()
-    q.close()
-    request_zaraz_travel(message)
-
-
-@bot.message_handler(func=lambda message: message.text == '💵Від 1500$')
-def get_cost(message):
-    log(message)
-    bot.send_message(message.chat.id, 'Формуємо вашу персональну підбірку📠\nЗачекайте⏳')
-    cost = message.text
-    connection = sql.connect('DATABASE.sqlite')
-    q = connection.cursor()
-    q.execute("UPDATE user SET cost='%s' WHERE id='%s'" % (cost[5:-1], message.from_user.id))
-    connection.commit()
-    q.close()
-    request_zaraz_travel(message)
+# @bot.message_handler(func=lambda message: message.text == '💵0-300$')
+# def get_cost(message):
+#     log(message)
+#     bot.send_message(message.chat.id, 'Формуємо вашу персональну підбірку📠\nЗачекайте⏳')
+#     cost = message.text
+#     connection = sql.connect('DATABASE.sqlite')
+#     q = connection.cursor()
+#     q.execute("UPDATE user SET cost='%s' WHERE id='%s'" % (cost[1:-1], message.from_user.id))
+#     connection.commit()
+#     q.close()
+#     connection.close()
+#     request_zaraz_travel(message)
+#
+#
+# @bot.message_handler(func=lambda message: message.text == '💵300-600$')
+# def get_cost(message):
+#     log(message)
+#     bot.send_message(message.chat.id, 'Формуємо вашу персональну підбірку📠\nЗачекайте⏳')
+#     cost = message.text
+#     connection = sql.connect('DATABASE.sqlite')
+#     q = connection.cursor()
+#     q.execute("UPDATE user SET cost='%s' WHERE id='%s'" % (cost[1:-1], message.from_user.id))
+#     connection.commit()
+#     q.close()
+#     request_zaraz_travel(message)
+#
+#
+# @bot.message_handler(func=lambda message: message.text == '💵600-900$')
+# def get_cost(message):
+#     log(message)
+#     bot.send_message(message.chat.id, 'Формуємо вашу персональну підбірку📠\nЗачекайте⏳')
+#     cost = message.text
+#     connection = sql.connect('DATABASE.sqlite')
+#     q = connection.cursor()
+#     q.execute("UPDATE user SET cost='%s' WHERE id='%s'" % (cost[1:-1], message.from_user.id))
+#     connection.commit()
+#     q.close()
+#     request_zaraz_travel(message)
+#
+#
+# @bot.message_handler(func=lambda message: message.text == '💵900-1200$')
+# def get_cost(message):
+#     log(message)
+#     bot.send_message(message.chat.id, 'Формуємо вашу персональну підбірку📠\nЗачекайте⏳')
+#     cost = message.text
+#     connection = sql.connect('DATABASE.sqlite')
+#     q = connection.cursor()
+#     q.execute("UPDATE user SET cost='%s' WHERE id='%s'" % (cost[1:-1], message.from_user.id))
+#     connection.commit()
+#     q.close()
+#     request_zaraz_travel(message)
+#
+#
+# @bot.message_handler(func=lambda message: message.text == '💵1200-1500$')
+# def get_cost(message):
+#     log(message)
+#     bot.send_message(message.chat.id, 'Формуємо вашу персональну підбірку📠\nЗачекайте⏳')
+#     cost = message.text
+#     connection = sql.connect('DATABASE.sqlite')
+#     q = connection.cursor()
+#     q.execute("UPDATE user SET cost='%s' WHERE id='%s'" % (cost[1:-1], message.from_user.id))
+#     connection.commit()
+#     q.close()
+#     request_zaraz_travel(message)
+#
+#
+# @bot.message_handler(func=lambda message: message.text == '💵Від 1500$')
+# def get_cost(message):
+#     log(message)
+#     bot.send_message(message.chat.id, 'Формуємо вашу персональну підбірку📠\nЗачекайте⏳')
+#     cost = message.text
+#     connection = sql.connect('DATABASE.sqlite')
+#     q = connection.cursor()
+#     q.execute("UPDATE user SET cost='%s' WHERE id='%s'" % (cost[5:-1], message.from_user.id))
+#     connection.commit()
+#     q.close()
+#     request_zaraz_travel(message)
 
 
 # BOT RUNNING
