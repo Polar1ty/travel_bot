@@ -68,14 +68,11 @@ def request_zaraz_travel(message):
     driver.execute_script(f"arguments[0].setAttribute('value','{results[0][3]}')", fromfrom)  # set fromfrom date
     fromto = driver.find_element_by_xpath('//*[@id="ssam-theme-default-search-box"]/div[1]/input[2]')
     driver.execute_script(f"arguments[0].setAttribute('value','{results[0][3]}')", fromto)  # set fromto date
-    # --------------- #
-    # Here should be set count of nights
     driver.find_element_by_xpath('//*[@id="ssam-theme-default-nights-box"]/div[1]/span').click()
     time.sleep(0.5)
     driver.find_element_by_xpath(f'//*[@id="lamaselect-custom-nights-from"]/option[{results[0][4]}]').click()  # click from nights
     time.sleep(0.5)
     driver.find_element_by_xpath(f'//*[@id="lamaselect-custom-nights-to"]/option[{results[0][4]}]').click()  # click to nights
-    # --------------- #
     adults = driver.find_element_by_xpath('//*[@id="ssam-theme-default-search-box"]/div[1]/input[3]')
     driver.execute_script(f"arguments[0].setAttribute('value','{results[0][5]}')", adults)  # set count_of adults
     children = driver.find_element_by_xpath('//*[@id="ssam-theme-default-search-box"]/div[1]/input[4]')
@@ -98,7 +95,7 @@ def request_zaraz_travel(message):
         driver.execute_script(f"arguments[0].setAttribute('value','{results[0][11]}')", age3)  # set age3 of children
     driver.execute_script(f"arguments[0].setAttribute('data-values','{results[0][7]}')", stars)  # set count of stars
     driver.find_element_by_xpath('//*[@id="ssam-theme-default-search-box"]/div[5]/button').click()  # Press Шукати
-    time.sleep(6.5)
+    time.sleep(6)
     # all_tours = driver.find_element_by_xpath('/html/body/main/section[2]/div/div/div[2]/div/div[2]/div[2]/div[2]/div/div/div[2]') # work!
     print(driver.find_elements_by_xpath(
         '/html/body/main/section[2]/div/div/div[2]/div/div[2]/div[2]/div[2]/div/div/div[2]/div[1]/div/div/div[2]/div[3]/div[2]/a'))
@@ -149,15 +146,37 @@ def request_zaraz_travel(message):
     all_tours.clear()
     driver.quit()
 
-def ask_from(message):
-    button1 = types.KeyboardButton('🇺🇦Київ')
-    button2 = types.KeyboardButton('🇺🇦Запоріжжя')
-    button3 = types.KeyboardButton('🇺🇦Львів')
-    button4 = types.KeyboardButton('🇺🇦Одесса')
-    button5 = types.KeyboardButton('🇺🇦Харків')
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True, row_width=2)
-    markup.add(button1, button2, button3, button4, button5)
-    bot.send_message(message.chat.id, 'Гарний вибір! Оберіть місто виліту:', reply_markup=markup)
+def ask_to(message):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2, one_time_keyboard=True)
+    button1 = types.KeyboardButton('🇦🇿Азербайджан')
+    button2 = types.KeyboardButton('🇦🇱Албания')
+    button3 = types.KeyboardButton('🇧🇬Болгария')
+    button4 = types.KeyboardButton('🇬🇷Греция')
+    button5 = types.KeyboardButton('🇬🇪Грузия')
+    button6 = types.KeyboardButton('🇩🇴Доминиканская республика')
+    button7 = types.KeyboardButton('🇪🇬Египет')
+    button8 = types.KeyboardButton('🇮🇱Израиль')
+    button9 = types.KeyboardButton('🇮🇩Индонезия')
+    button10 = types.KeyboardButton('🇪🇸Испания')
+    button11 = types.KeyboardButton('🇮🇹Италия')
+    button12 = types.KeyboardButton('🇨🇾Кипр')
+    button13 = types.KeyboardButton('🇨🇳Китай')
+    button14 = types.KeyboardButton('🇨🇺Куба')
+    button15 = types.KeyboardButton('🇲🇾Малайзия')
+    button16 = types.KeyboardButton('🇲🇻Мальдивы')
+    button17 = types.KeyboardButton('🇲🇦Марокко')
+    button18 = types.KeyboardButton('🇦🇪ОАЭ')
+    button19 = types.KeyboardButton('🇴🇲Оман')
+    button20 = types.KeyboardButton('🇵🇹Португалия')
+    button21 = types.KeyboardButton('🇹🇭Таиланд')
+    button22 = types.KeyboardButton('🇹🇳Тунис')
+    button23 = types.KeyboardButton('🇹🇷Турция')
+    button24 = types.KeyboardButton('🇭🇷Хорватия')
+    button25 = types.KeyboardButton('🇱🇰Шри-Ланка')
+    markup.add(button1, button2, button3, button4, button5, button6, button7, button8, button9, button10, button11,
+               button12, button13, button14, button15, button16, button17, button18, button19, button20, button21,
+               button22, button23, button24, button25)
+    bot.send_message(message.chat.id, 'Гарний вибір! Оберіть країну:', reply_markup=markup)
 
 
 def ask_when(message):
@@ -363,36 +382,15 @@ def start(message):
     bot.send_chat_action(message.chat.id, action='typing')
     time.sleep(1)
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2, one_time_keyboard=True)
-    button1 = types.KeyboardButton('🇦🇿Азербайджан')
-    button2 = types.KeyboardButton('🇦🇱Албания')
-    button3 = types.KeyboardButton('🇧🇬Болгария')
-    button4 = types.KeyboardButton('🇬🇷Греция')
-    button5 = types.KeyboardButton('🇬🇪Грузия')
-    button6 = types.KeyboardButton('🇩🇴Доминиканская республика')
-    button7 = types.KeyboardButton('🇪🇬Египет')
-    button8 = types.KeyboardButton('🇮🇱Израиль')
-    button9 = types.KeyboardButton('🇮🇩Индонезия')
-    button10 = types.KeyboardButton('🇪🇸Испания')
-    button11 = types.KeyboardButton('🇮🇹Италия')
-    button12 = types.KeyboardButton('🇨🇾Кипр')
-    button13 = types.KeyboardButton('🇨🇳Китай')
-    button14 = types.KeyboardButton('🇨🇺Куба')
-    button15 = types.KeyboardButton('🇲🇾Малайзия')
-    button16 = types.KeyboardButton('🇲🇻Мальдивы')
-    button17 = types.KeyboardButton('🇲🇦Марокко')
-    button18 = types.KeyboardButton('🇦🇪ОАЭ')
-    button19 = types.KeyboardButton('🇴🇲Оман')
-    button20 = types.KeyboardButton('🇵🇹Португалия')
-    button21 = types.KeyboardButton('🇹🇭Таиланд')
-    button22 = types.KeyboardButton('🇹🇳Тунис')
-    button23 = types.KeyboardButton('🇹🇷Турция')
-    button24 = types.KeyboardButton('🇭🇷Хорватия')
-    button25 = types.KeyboardButton('🇱🇰Шри-Ланка')
-    markup.add(button1, button2, button3, button4, button5, button6, button7, button8, button9, button10, button11,
-               button12, button13, button14, button15, button16, button17, button18, button19, button20, button21,
-               button22, button23, button24, button25)
+    button1 = types.KeyboardButton('🇺🇦Київ')
+    button2 = types.KeyboardButton('🇺🇦Запоріжжя')
+    button3 = types.KeyboardButton('🇺🇦Львів')
+    button4 = types.KeyboardButton('🇺🇦Одесса')
+    button5 = types.KeyboardButton('🇺🇦Харків')
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True, row_width=2)
+    markup.add(button1, button2, button3, button4, button5)
     bot.send_message(message.chat.id,
-                     'Добридень {0.first_name}, вас вітає бот для знаходження та порівняння подорожей-{1.first_name}✈🏝\nОберіть країну👇'.format(
+                     'Добридень {0.first_name}, вас вітає бот для знаходження та порівняння подорожей-{1.first_name}✈🏝\nОберіть місто виліту👇'.format(
                          message.from_user, bot.get_me()), reply_markup=markup)
     utility = {
         'c_age2': '',
@@ -410,7 +408,7 @@ def send_calendar(message):
     connection.commit()
     q.close()
     connection.close()
-    ask_from(message)
+    ask_when(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇦🇱Албания')
@@ -423,7 +421,7 @@ def send_calendar(message):
     connection.commit()
     q.close()
     connection.close()
-    ask_from(message)
+    ask_when(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇧🇬Болгария')
@@ -436,7 +434,7 @@ def send_calendar(message):
     connection.commit()
     q.close()
     connection.close()
-    ask_from(message)
+    ask_when(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇬🇷Греция')
@@ -449,7 +447,7 @@ def send_calendar(message):
     connection.commit()
     q.close()
     connection.close()
-    ask_from(message)
+    ask_when(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇬🇪Грузия')
@@ -462,7 +460,7 @@ def send_calendar(message):
     connection.commit()
     q.close()
     connection.close()
-    ask_from(message)
+    ask_when(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇩🇴Доминиканская республика')
@@ -475,7 +473,7 @@ def send_calendar(message):
     connection.commit()
     q.close()
     connection.close()
-    ask_from(message)
+    ask_when(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇪🇬Египет')
@@ -488,7 +486,7 @@ def send_calendar(message):
     connection.commit()
     q.close()
     connection.close()
-    ask_from(message)
+    ask_when(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇮🇱Израиль')
@@ -501,7 +499,7 @@ def send_calendar(message):
     connection.commit()
     q.close()
     connection.close()
-    ask_from(message)
+    ask_when(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇮🇩Индонезия')
@@ -514,7 +512,7 @@ def send_calendar(message):
     connection.commit()
     q.close()
     connection.close()
-    ask_from(message)
+    ask_when(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇪🇸Испания')
@@ -527,7 +525,7 @@ def send_calendar(message):
     connection.commit()
     q.close()
     connection.close()
-    ask_from(message)
+    ask_when(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇮🇹Италия')
@@ -540,7 +538,7 @@ def send_calendar(message):
     connection.commit()
     q.close()
     connection.close()
-    ask_from(message)
+    ask_when(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇨🇾Кипр')
@@ -553,7 +551,7 @@ def send_calendar(message):
     connection.commit()
     q.close()
     connection.close()
-    ask_from(message)
+    ask_when(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇨🇳Китай')
@@ -566,7 +564,7 @@ def send_calendar(message):
     connection.commit()
     q.close()
     connection.close()
-    ask_from(message)
+    ask_when(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇨🇺Куба')
@@ -579,7 +577,7 @@ def send_calendar(message):
     connection.commit()
     q.close()
     connection.close()
-    ask_from(message)
+    ask_when(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇲🇾Малайзия')
@@ -592,7 +590,7 @@ def send_calendar(message):
     connection.commit()
     q.close()
     connection.close()
-    ask_from(message)
+    ask_when(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇲🇻Мальдивы')
@@ -605,7 +603,7 @@ def send_calendar(message):
     connection.commit()
     q.close()
     connection.close()
-    ask_from(message)
+    ask_when(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇲🇦Марокко')
@@ -618,7 +616,7 @@ def send_calendar(message):
     connection.commit()
     q.close()
     connection.close()
-    ask_from(message)
+    ask_when(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇦🇪ОАЭ')
@@ -631,7 +629,7 @@ def send_calendar(message):
     connection.commit()
     q.close()
     connection.close()
-    ask_from(message)
+    ask_when(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇴🇲Оман')
@@ -644,7 +642,7 @@ def send_calendar(message):
     connection.commit()
     q.close()
     connection.close()
-    ask_from(message)
+    ask_when(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇵🇹Португалия')
@@ -657,7 +655,7 @@ def send_calendar(message):
     connection.commit()
     q.close()
     connection.close()
-    ask_from(message)
+    ask_when(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇹🇭Таиланд')
@@ -670,7 +668,7 @@ def send_calendar(message):
     connection.commit()
     q.close()
     connection.close()
-    ask_from(message)
+    ask_when(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇹🇳Тунис')
@@ -683,7 +681,7 @@ def send_calendar(message):
     connection.commit()
     q.close()
     connection.close()
-    ask_from(message)
+    ask_when(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇹🇷Турция')
@@ -696,7 +694,7 @@ def send_calendar(message):
     connection.commit()
     q.close()
     connection.close()
-    ask_from(message)
+    ask_when(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇭🇷Хорватия')
@@ -709,7 +707,7 @@ def send_calendar(message):
     connection.commit()
     q.close()
     connection.close()
-    ask_from(message)
+    ask_when(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇱🇰Шри-Ланка')
@@ -722,7 +720,7 @@ def send_calendar(message):
     connection.commit()
     q.close()
     connection.close()
-    ask_from(message)
+    ask_when(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇺🇦Київ')
@@ -736,7 +734,7 @@ def ask_date_from(message):
     connection.commit()
     q.close()
     connection.close()
-    ask_when(message)
+    ask_to(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇺🇦Запоріжжя')
@@ -749,7 +747,7 @@ def ask_date_from(message):
     connection.commit()
     q.close()
     connection.close()
-    ask_when(message)
+    ask_to(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇺🇦Львів')
@@ -762,7 +760,7 @@ def ask_date_from(message):
     connection.commit()
     q.close()
     connection.close()
-    ask_when(message)
+    ask_to(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇺🇦Одесса')
@@ -775,7 +773,7 @@ def ask_date_from(message):
     connection.commit()
     q.close()
     connection.close()
-    ask_when(message)
+    ask_to(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇺🇦Харків')
@@ -788,7 +786,7 @@ def ask_date_from(message):
     connection.commit()
     q.close()
     connection.close()
-    ask_when(message)
+    ask_to(message)
 
 
 @bot.message_handler(func=lambda message: message.text == 'Від 1🌙')
@@ -858,11 +856,12 @@ def ask_count_adult(message):
 
 @bot.message_handler(func=lambda message: message.text == 'Від 11🌙')
 def ask_count_adult(message):
+    # TODO: Сделать обработку кол-ва ночей из двух чисел
     log(message)
     nights = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
-    q.execute("UPDATE user SET nights='%s' WHERE id='%s'" % (nights[4], message.from_user.id))
+    q.execute("UPDATE user SET nights='%s' WHERE id='%s'" % (nights[4:6], message.from_user.id))
     connection.commit()
     q.close()
     connection.close()
@@ -875,7 +874,7 @@ def ask_count_adult(message):
     nights = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
-    q.execute("UPDATE user SET nights='%s' WHERE id='%s'" % (nights[4], message.from_user.id))
+    q.execute("UPDATE user SET nights='%s' WHERE id='%s'" % (nights[4:6], message.from_user.id))
     connection.commit()
     q.close()
     connection.close()
