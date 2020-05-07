@@ -12,9 +12,9 @@ import dbworker
 from telebot import types
 import time
 import inline_calendar
-import random
 from selenium import webdriver
 import selenium
+import schedule
 
 
 # connection = sql.connect('DATABASE.sqlite')
@@ -39,6 +39,7 @@ import selenium
 # connection.close()
 
 utility = {}
+
 
 def log(message):
     """ Logging user messages """
@@ -95,7 +96,7 @@ def request_zaraz_travel(message):
         driver.execute_script(f"arguments[0].setAttribute('value','{results[0][11]}')", age3)  # set age3 of children
     driver.execute_script(f"arguments[0].setAttribute('data-values','{results[0][7]}')", stars)  # set count of stars
     driver.find_element_by_xpath('//*[@id="ssam-theme-default-search-box"]/div[5]/button').click()  # Press Шукати
-    time.sleep(6)
+    time.sleep(6.25)
     # all_tours = driver.find_element_by_xpath('/html/body/main/section[2]/div/div/div[2]/div/div[2]/div[2]/div[2]/div/div/div[2]') # work!
     print(driver.find_elements_by_xpath(
         '/html/body/main/section[2]/div/div/div[2]/div/div[2]/div[2]/div[2]/div/div/div[2]/div[1]/div/div/div[2]/div[3]/div[2]/a'))
@@ -118,10 +119,6 @@ def request_zaraz_travel(message):
                 country = driver.find_element_by_xpath(
                     f'/html/body/main/section[2]/div/div/div[2]/div/div[2]/div[2]/div[2]/div/div/div[2]/div[{i}]/div/div/div[2]/div[3]/div[1]/p/span').text
                 print(url)
-                print(price)
-                print(hotel)
-                print(date)
-                print(country)
                 dict = {
                     'url': url,
                     'price': price,
@@ -145,6 +142,16 @@ def request_zaraz_travel(message):
     tours_for_msg.clear()
     all_tours.clear()
     driver.quit()
+
+
+def ask_daily_tour(message):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2, one_time_keyboard=True)
+    button1 = types.KeyboardButton('Так✅')
+    button2 = types.KeyboardButton('Ні❎')
+    button3 = types.KeyboardButton('Спочатку🔁')
+    markup.add(button1, button2, button3)
+    bot.send_message(message.chat.id, 'Бажаєте мати особисту підбірку турів кожен день?', reply_markup=markup)
+
 
 def ask_to(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2, one_time_keyboard=True)
@@ -396,6 +403,32 @@ def start(message):
         'c_age2': '',
         'c_age3': ''
     }
+
+
+@bot.message_handler(func=lambda message: message.text == 'Так✅')
+def yes(message):
+    log(message)
+    bot.send_message(message.chat.id, 'У цей час кожного дня вам буде надсилатися ваша персональна підбірка турів\nДякуюємо, що обрали нас!')
+    try:
+        schedule.every().day.do(request_zaraz_travel, message)
+        while True:
+            schedule.run_pending()
+            time.sleep(1)
+    except Exception as e:
+        print("SendToursPeriodically: " + str(e) + "\n")
+
+
+
+@bot.message_handler(func=lambda message: message.text == 'Ні❎')
+def no(message):
+    log(message)
+    bot.send_message(message.chat.id, 'Дякуємо що скористались нашим ботом🙂\nЯкщо бажаєте знайти нові тури напишіть послідовно /reset /start')
+
+
+@bot.message_handler(func=lambda message: message.text == 'Спочатку🔁')
+def again(message):
+    log(message)
+    start(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '🇦🇿Азербайджан')
@@ -1627,6 +1660,7 @@ def get_stars(message):
     connection.close()
     bot.send_message(message.chat.id, 'Формуємо вашу персональну підбірку📠\nЗачекайте⏳')
     request_zaraz_travel(message)
+    ask_daily_tour(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '⭐⭐⭐')
@@ -1641,6 +1675,7 @@ def get_stars(message):
     connection.close()
     bot.send_message(message.chat.id, 'Формуємо вашу персональну підбірку📠\nЗачекайте⏳')
     request_zaraz_travel(message)
+    ask_daily_tour(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '⭐⭐⭐⭐')
@@ -1655,6 +1690,7 @@ def get_stars(message):
     connection.close()
     bot.send_message(message.chat.id, 'Формуємо вашу персональну підбірку📠\nЗачекайте⏳')
     request_zaraz_travel(message)
+    ask_daily_tour(message)
 
 
 @bot.message_handler(func=lambda message: message.text == '⭐⭐⭐⭐⭐')
@@ -1669,6 +1705,7 @@ def get_stars(message):
     connection.close()
     bot.send_message(message.chat.id, 'Формуємо вашу персональну підбірку📠\nЗачекайте⏳')
     request_zaraz_travel(message)
+    ask_daily_tour(message)
 
 
 # @bot.message_handler(func=lambda message: message.text == '💵0-300$')
@@ -1748,7 +1785,6 @@ def get_stars(message):
 #     connection.commit()
 #     q.close()
 #     request_zaraz_travel(message)
-
 
 # BOT RUNNING
 if __name__ == '__main__':
