@@ -8,13 +8,14 @@ import config
 import telebot
 import datetime
 import sqlite3 as sql
-import dbworker
+import threading
 from telebot import types
 import time
 import inline_calendar
 from selenium import webdriver
 import selenium
 import schedule
+from selenium.webdriver.chrome.options import Options
 
 
 # connection = sql.connect('DATABASE.sqlite')
@@ -59,7 +60,9 @@ def request_zaraz_travel(message):
     connection.commit()
     q.close()
     connection.close()
-    driver = webdriver.Chrome('C:\\Users\Alexeii\PycharmProjects\ChromeDriver\chromedriver.exe')
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    driver = webdriver.Chrome('C:\\Users\Alexeii\PycharmProjects\ChromeDriver\chromedriver.exe', options=chrome_options)
     driver.get("https://zaraz.travel/")
     country_set = driver.find_element_by_xpath('//*[@id="ssam-theme-default-town-to-box"]')
     driver.execute_script(f"arguments[0].setAttribute('data-values','{results[0][1].split(',')[1]}')", country_set)  # set county code
@@ -96,8 +99,7 @@ def request_zaraz_travel(message):
         driver.execute_script(f"arguments[0].setAttribute('value','{results[0][11]}')", age3)  # set age3 of children
     driver.execute_script(f"arguments[0].setAttribute('data-values','{results[0][7]}')", stars)  # set count of stars
     driver.find_element_by_xpath('//*[@id="ssam-theme-default-search-box"]/div[5]/button').click()  # Press Шукати
-    time.sleep(6.25)
-    # all_tours = driver.find_element_by_xpath('/html/body/main/section[2]/div/div/div[2]/div/div[2]/div[2]/div[2]/div/div/div[2]') # work!
+    time.sleep(8)
     print(driver.find_elements_by_xpath(
         '/html/body/main/section[2]/div/div/div[2]/div/div[2]/div[2]/div[2]/div/div/div[2]/div[1]/div/div/div[2]/div[3]/div[2]/a'))
     if driver.find_elements_by_xpath('/html/body/main/section[2]/div/div/div[2]/div/div[2]/div[2]/div[2]/div/div/div[2]/div[1]/div/div/div[2]/div[3]/div[2]/a') == []:
@@ -141,7 +143,7 @@ def request_zaraz_travel(message):
         bot.send_message(message.chat.id, 'По вашому запиту не знайдено жодних тарифів🤷‍\nСпробуйте змінити критерії пошуку🔁\nНапишіть /reset для перезапуску')
     tours_for_msg.clear()
     all_tours.clear()
-    driver.quit()
+    # driver.quit()
 
 
 def ask_daily_tour(message):
@@ -401,8 +403,19 @@ def start(message):
                          message.from_user, bot.get_me()), reply_markup=markup)
     utility = {
         'c_age2': '',
-        'c_age3': ''
+        'c_age3': '',
+        'sub': ''
     }
+
+
+@bot.message_handler(commands=['unsubscribe'])
+def unsubscribe(message):
+    """ Unsubscribe every day last-minute tours """
+    log(message)
+    print('!!!WORK!!!')
+    if utility.get(str(message.chat.id) + 'sub') != '':
+        schedule.cancel_job(utility.get(str(message.chat.id) + 'sub'))
+    bot.send_message(message.chat.id, 'Більше вам не будуть приходити щоденні підбірки турів')
 
 
 @bot.message_handler(func=lambda message: message.text == 'Так✅')
@@ -410,10 +423,20 @@ def yes(message):
     log(message)
     bot.send_message(message.chat.id, 'У цей час кожного дня вам буде надсилатися ваша персональна підбірка турів\nДякуюємо, що обрали нас!')
     try:
-        schedule.every().day.do(request_zaraz_travel, message)
-        while True:
-            schedule.run_pending()
-            time.sleep(1)
+        sub = schedule.every(60).seconds.do(request_zaraz_travel, message)
+        kill_update = threading.Event()
+
+        class SearchUpdateThread(threading.Thread):
+            def run(self):
+                while not kill_update.is_set():
+                    schedule.run_pending()
+                    time.sleep(10)
+
+        searchThread = SearchUpdateThread()
+        searchThread.setDaemon(True)
+        searchThread.start()
+        print(sub)
+        utility.update({str(message.from_user.id) + 'sub': sub})
     except Exception as e:
         print("SendToursPeriodically: " + str(e) + "\n")
 
