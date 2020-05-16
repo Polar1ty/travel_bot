@@ -5,6 +5,7 @@
 """
 
 import config
+import os
 import telebot
 import datetime
 import sqlite3 as sql
@@ -16,7 +17,6 @@ from selenium import webdriver
 import selenium
 import schedule
 from selenium.webdriver.chrome.options import Options
-
 
 # connection = sql.connect('DATABASE.sqlite')
 # q = connection.cursor()
@@ -52,6 +52,8 @@ def log(message):
 
 
 def request_zaraz_travel(message):
+    bot.send_chat_action(message.chat.id, action='typing')
+    time.sleep(0.1)
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
     q.execute("SELECT * from user WHERE id='%s'" % message.from_user.id)
@@ -60,23 +62,36 @@ def request_zaraz_travel(message):
     connection.commit()
     q.close()
     connection.close()
+
+    # chrome_options = webdriver.ChromeOptions()
+    # chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+    # chrome_options.add_argument("--headless")
+    # chrome_options.add_argument("--disable-dev-shm-usage")
+    # chrome_options.add_argument("--no-sandbox")
+    # driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
+    # C:\\Users\Alexeii\PycharmProjects\ChromeDriver\chromedriver.exe
     chrome_options = Options()
     chrome_options.add_argument("--headless")
-    driver = webdriver.Chrome('C:\\Users\Alexeii\PycharmProjects\ChromeDriver\chromedriver.exe', options=chrome_options)
+    driver = webdriver.Chrome(
+        'C:\\Users\Alexeii\PycharmProjects\ChromeDriver\chromedriver.exe')  # options=chrome_options
     driver.get("https://zaraz.travel/")
     country_set = driver.find_element_by_xpath('//*[@id="ssam-theme-default-town-to-box"]')
-    driver.execute_script(f"arguments[0].setAttribute('data-values','{results[0][1].split(',')[1]}')", country_set)  # set county code
+    driver.execute_script(f"arguments[0].setAttribute('data-values','{results[0][1].split(',')[1]}')",
+                          country_set)  # set county code
     city = driver.find_element_by_xpath('//*[@id="ssam-theme-default-town-from-box"]')
-    driver.execute_script(f"arguments[0].setAttribute('data-values','{results[0][2].split(',')[1]}')", city)  # set city code
+    driver.execute_script(f"arguments[0].setAttribute('data-values','{results[0][2].split(',')[1]}')",
+                          city)  # set city code
     fromfrom = driver.find_element_by_xpath('//*[@id="ssam-theme-default-search-box"]/div[1]/input[1]')
     driver.execute_script(f"arguments[0].setAttribute('value','{results[0][3]}')", fromfrom)  # set fromfrom date
     fromto = driver.find_element_by_xpath('//*[@id="ssam-theme-default-search-box"]/div[1]/input[2]')
     driver.execute_script(f"arguments[0].setAttribute('value','{results[0][3]}')", fromto)  # set fromto date
     driver.find_element_by_xpath('//*[@id="ssam-theme-default-nights-box"]/div[1]/span').click()
     time.sleep(0.5)
-    driver.find_element_by_xpath(f'//*[@id="lamaselect-custom-nights-from"]/option[{results[0][4]}]').click()  # click from nights
+    driver.find_element_by_xpath(
+        f'//*[@id="lamaselect-custom-nights-from"]/option[{results[0][4]}]').click()  # click from nights
     time.sleep(0.5)
-    driver.find_element_by_xpath(f'//*[@id="lamaselect-custom-nights-to"]/option[{results[0][4]}]').click()  # click to nights
+    driver.find_element_by_xpath(
+        f'//*[@id="lamaselect-custom-nights-to"]/option[{results[0][4]}]').click()  # click to nights
     adults = driver.find_element_by_xpath('//*[@id="ssam-theme-default-search-box"]/div[1]/input[3]')
     driver.execute_script(f"arguments[0].setAttribute('value','{results[0][5]}')", adults)  # set count_of adults
     children = driver.find_element_by_xpath('//*[@id="ssam-theme-default-search-box"]/div[1]/input[4]')
@@ -99,10 +114,11 @@ def request_zaraz_travel(message):
         driver.execute_script(f"arguments[0].setAttribute('value','{results[0][11]}')", age3)  # set age3 of children
     driver.execute_script(f"arguments[0].setAttribute('data-values','{results[0][7]}')", stars)  # set count of stars
     driver.find_element_by_xpath('//*[@id="ssam-theme-default-search-box"]/div[5]/button').click()  # Press Шукати
-    time.sleep(8)
+    time.sleep(15)
     print(driver.find_elements_by_xpath(
         '/html/body/main/section[2]/div/div/div[2]/div/div[2]/div[2]/div[2]/div/div/div[2]/div[1]/div/div/div[2]/div[3]/div[2]/a'))
-    if driver.find_elements_by_xpath('/html/body/main/section[2]/div/div/div[2]/div/div[2]/div[2]/div[2]/div/div/div[2]/div[1]/div/div/div[2]/div[3]/div[2]/a') == []:
+    if driver.find_elements_by_xpath(
+            '/html/body/main/section[2]/div/div/div[2]/div/div[2]/div[2]/div[2]/div/div/div[2]/div[1]/div/div/div[2]/div[3]/div[2]/a') == []:
         print('Ничего не найдено')
         all_tours = []
     else:
@@ -114,13 +130,21 @@ def request_zaraz_travel(message):
                     "href")
                 price = driver.find_element_by_xpath(
                     f'/html/body/main/section[2]/div/div/div[2]/div/div[2]/div[2]/div[2]/div/div/div[2]/div[{i}]/div/div/div[2]/div[3]/div[2]/a').text
-                hotel = driver.find_element_by_xpath(
-                    f'/html/body/main/section[2]/div/div/div[2]/div/div[2]/div[2]/div[2]/div/div/div[2]/div[{i}]/div/div/div[2]/div[1]/a/p').text
+                if driver.find_elements_by_xpath(
+                        f'/html/body/main/section[2]/div/div/div[2]/div/div[2]/div[2]/div[2]/div/div/div[2]/div[{i}]/div/div/div[2]/div[1]/a/p') == []:
+                    hotel = driver.find_element_by_xpath(
+                        f'/html/body/main/section[2]/div/div/div[2]/div/div[2]/div[2]/div[2]/div/div/div[2]/div[1]/div/div/div[2]/div[1]/p').text
+                else:
+                    hotel = driver.find_element_by_xpath(
+                        f'/html/body/main/section[2]/div/div/div[2]/div/div[2]/div[2]/div[2]/div/div/div[2]/div[{i}]/div/div/div[2]/div[1]/a/p').text
+                    # /html/body/main/section[2]/div/div/div[2]/div/div[2]/div[2]/div[2]/div/div/div[2]/div[1]/div/div/div[2]/div[1]/p
+                print(hotel)
                 date = driver.find_element_by_xpath(
                     f'/html/body/main/section[2]/div/div/div[2]/div/div[2]/div[2]/div[2]/div/div/div[2]/div[{i}]/div/div/div[2]/div[2]/div[2]/p[2]').text
+                # /html/body/main/section[2]/div/div/div[2]/div/div[2]/div[2]/div[2]/div/div/div[2]/div[1]/div/div/div[2]/div[2]/div[2]/p[2]
                 country = driver.find_element_by_xpath(
                     f'/html/body/main/section[2]/div/div/div[2]/div/div[2]/div[2]/div[2]/div/div/div[2]/div[{i}]/div/div/div[2]/div[3]/div[1]/p/span').text
-                print(url)
+                # /html/body/main/section[2]/div/div/div[2]/div/div[2]/div[2]/div[2]/div/div/div[2]/div[1]/div/div/div[2]/div[3]/div[1]/p/span
                 dict = {
                     'url': url,
                     'price': price,
@@ -140,10 +164,11 @@ def request_zaraz_travel(message):
         print(tours_for_msg)
         bot.send_message(message.chat.id, text='\n\n'.join(tours_for_msg), parse_mode='HTML')
     except IndexError:
-        bot.send_message(message.chat.id, 'По вашому запиту не знайдено жодних тарифів🤷‍\nСпробуйте змінити критерії пошуку🔁\nНапишіть /reset для перезапуску')
+        bot.send_message(message.chat.id,
+                         'По вашому запиту не знайдено жодних тарифів🤷‍\nСпробуйте змінити критерії пошуку🔁\nНапишіть /reset для перезапуску')
     tours_for_msg.clear()
     all_tours.clear()
-    # driver.quit()
+    driver.quit()
 
 
 def ask_daily_tour(message):
@@ -329,7 +354,8 @@ def calendar_callback_handler(q: types.CallbackQuery):
                                   reply_markup=inline_calendar.get_keyboard(q.from_user.id))
             connection = sql.connect('DATABASE.sqlite')
             q1 = connection.cursor()
-            db_picked_data = str(str(picked_data).split('-')[2]) + '.' + str(str(picked_data).split('-')[1]) + '.' + str(str(picked_data).split('-')[0])
+            db_picked_data = str(str(picked_data).split('-')[2]) + '.' + str(
+                str(picked_data).split('-')[1]) + '.' + str(str(picked_data).split('-')[0])
             print(db_picked_data)
             q1.execute("UPDATE user SET date_from='%s' WHERE id='%s'" % (db_picked_data, q.from_user.id))
             connection.commit()
@@ -421,9 +447,10 @@ def unsubscribe(message):
 @bot.message_handler(func=lambda message: message.text == 'Так✅')
 def yes(message):
     log(message)
-    bot.send_message(message.chat.id, 'У цей час кожного дня вам буде надсилатися ваша персональна підбірка турів\nДякуюємо, що обрали нас!')
+    bot.send_message(message.chat.id,
+                     'У цей час кожного дня вам буде надсилатися ваша персональна підбірка турів\nДякуюємо, що обрали нас!')
     try:
-        sub = schedule.every(60).seconds.do(request_zaraz_travel, message)
+        sub = schedule.every().day.at(datetime.datetime.now().strftime("%H:%M")).do(request_zaraz_travel, message)
         kill_update = threading.Event()
 
         class SearchUpdateThread(threading.Thread):
@@ -441,11 +468,11 @@ def yes(message):
         print("SendToursPeriodically: " + str(e) + "\n")
 
 
-
 @bot.message_handler(func=lambda message: message.text == 'Ні❎')
 def no(message):
     log(message)
-    bot.send_message(message.chat.id, 'Дякуємо що скористались нашим ботом🙂\nЯкщо бажаєте знайти нові тури напишіть послідовно /reset /start')
+    bot.send_message(message.chat.id,
+                     'Дякуємо що скористались нашим ботом🙂\nЯкщо бажаєте знайти нові тури напишіть послідовно /reset /start')
 
 
 @bot.message_handler(func=lambda message: message.text == 'Спочатку🔁')
