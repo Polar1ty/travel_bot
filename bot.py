@@ -63,17 +63,17 @@ def request_zaraz_travel(message):
     q.close()
     connection.close()
 
-    # chrome_options = webdriver.ChromeOptions()
-    # chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
-    # chrome_options.add_argument("--headless")
-    # chrome_options.add_argument("--disable-dev-shm-usage")
-    # chrome_options.add_argument("--no-sandbox")
-    # driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
-    # C:\\Users\Alexeii\PycharmProjects\ChromeDriver\chromedriver.exe
-    chrome_options = Options()
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
     chrome_options.add_argument("--headless")
-    driver = webdriver.Chrome(
-        'C:\\Users\Alexeii\PycharmProjects\ChromeDriver\chromedriver.exe')  # options=chrome_options
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--no-sandbox")
+    driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
+    # C:\\Users\Alexeii\PycharmProjects\ChromeDriver\chromedriver.exe
+    # chrome_options = Options()
+    # chrome_options.add_argument("--headless")
+    # driver = webdriver.Chrome(
+    #     'C:\\Users\Alexeii\PycharmProjects\ChromeDriver\chromedriver.exe', options=chrome_options)  # options=chrome_options
     driver.get("https://zaraz.travel/")
     country_set = driver.find_element_by_xpath('//*[@id="ssam-theme-default-town-to-box"]')
     driver.execute_script(f"arguments[0].setAttribute('data-values','{results[0][1].split(',')[1]}')",
@@ -82,9 +82,9 @@ def request_zaraz_travel(message):
     driver.execute_script(f"arguments[0].setAttribute('data-values','{results[0][2].split(',')[1]}')",
                           city)  # set city code
     fromfrom = driver.find_element_by_xpath('//*[@id="ssam-theme-default-search-box"]/div[1]/input[1]')
-    driver.execute_script(f"arguments[0].setAttribute('value','{results[0][3]}')", fromfrom)  # set fromfrom date
+    driver.execute_script(f"arguments[0].setAttribute('value','{results[0][3].split(',')[0]}')", fromfrom)  # set fromfrom date
     fromto = driver.find_element_by_xpath('//*[@id="ssam-theme-default-search-box"]/div[1]/input[2]')
-    driver.execute_script(f"arguments[0].setAttribute('value','{results[0][3]}')", fromto)  # set fromto date
+    driver.execute_script(f"arguments[0].setAttribute('value','{results[0][3].split(',')[1]}')", fromto)  # set fromto date
     driver.find_element_by_xpath('//*[@id="ssam-theme-default-nights-box"]/div[1]/span').click()
     time.sleep(0.5)
     driver.find_element_by_xpath(
@@ -114,7 +114,7 @@ def request_zaraz_travel(message):
         driver.execute_script(f"arguments[0].setAttribute('value','{results[0][11]}')", age3)  # set age3 of children
     driver.execute_script(f"arguments[0].setAttribute('data-values','{results[0][7]}')", stars)  # set count of stars
     driver.find_element_by_xpath('//*[@id="ssam-theme-default-search-box"]/div[5]/button').click()  # Press Шукати
-    time.sleep(15)
+    time.sleep(11)
     print(driver.find_elements_by_xpath(
         '/html/body/main/section[2]/div/div/div[2]/div/div[2]/div[2]/div[2]/div/div/div[2]/div[1]/div/div/div[2]/div[3]/div[2]/a'))
     if driver.find_elements_by_xpath(
@@ -349,6 +349,7 @@ def calendar_callback_handler(q: types.CallbackQuery):
                                           reply_markup=inline_calendar.get_keyboard(q.from_user.id))
         else:
             picked_data = return_data
+            picked_data1 = return_data + datetime.timedelta(days=4)
             bot.edit_message_text(text=f'Обрана дата: {picked_data}', chat_id=q.from_user.id,
                                   message_id=q.message.message_id,
                                   reply_markup=inline_calendar.get_keyboard(q.from_user.id))
@@ -356,8 +357,11 @@ def calendar_callback_handler(q: types.CallbackQuery):
             q1 = connection.cursor()
             db_picked_data = str(str(picked_data).split('-')[2]) + '.' + str(
                 str(picked_data).split('-')[1]) + '.' + str(str(picked_data).split('-')[0])
-            print(db_picked_data)
-            q1.execute("UPDATE user SET date_from='%s' WHERE id='%s'" % (db_picked_data, q.from_user.id))
+            db_picked_data1 = str(str(picked_data1).split('-')[2]) + '.' + str(
+                str(picked_data1).split('-')[1]) + '.' + str(str(picked_data1).split('-')[0])
+            db_str_picked_data = db_picked_data + ',' + db_picked_data1
+            print(db_str_picked_data)
+            q1.execute("UPDATE user SET date_from='%s' WHERE id='%s'" % (db_str_picked_data, q.from_user.id))
             connection.commit()
             q1.close()
             connection.close()
@@ -428,9 +432,9 @@ def start(message):
                      'Добридень {0.first_name}, вас вітає бот для знаходження та порівняння подорожей-{1.first_name}✈🏝\nОберіть місто виліту👇'.format(
                          message.from_user, bot.get_me()), reply_markup=markup)
     utility = {
-        'c_age2': '',
-        'c_age3': '',
-        'sub': ''
+        str(message.chat.id) + 'c_age2': '',
+        str(message.chat.id) + 'c_age3': '',
+        str(message.chat.id) + 'sub': ''
     }
 
 
